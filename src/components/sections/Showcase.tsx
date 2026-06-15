@@ -64,17 +64,21 @@ const projects: Project[] = [
   },
 ];
 
-const SHUFFLE_MS = 2600;
+const SHUFFLE_MS = 3200; // time between swaps
+const SWAP_MS = 1100; // duration of each slide — slow and clearly visible
 const useIsoLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
+type Pos = { top: number; left: number };
 
 /**
  * Home showcase — an editorial gallery of selected projects.
  *
  * The four equal cards gently interchange positions on a timer using a FLIP
- * animation (measure first/last rects, invert with a transform, then play), so
- * the grid rearranges smoothly rather than snapping. The first (feature) slot
- * stays put so every move is a pure translation. Shuffling pauses on hover,
- * while the lightbox is open, and for reduced motion. Clicking a card opens a
+ * animation: layout positions are read with offsetTop/offsetLeft (which ignore
+ * transforms), so it only animates a genuine reorder and never fights its own
+ * in-flight transition. The feature slot stays put so every move is a pure,
+ * smooth translation. Shuffling pauses on hover, while the lightbox is open, on
+ * one-column layouts, and for reduced motion. Clicking a card opens a
  * fullscreen lightbox with a cloth/drape distortion reveal.
  */
 export function Showcase() {
@@ -84,7 +88,16 @@ export function Showcase() {
   const [enabled, setEnabled] = useState(false);
 
   const itemEls = useRef<Map<string, HTMLLIElement>>(new Map());
-  const prevRects = useRef<Map<string, DOMRect>>(new Map());
+  const positions = useRef<Map<string, Pos>>(new Map());
+  const lastOrder = useRef<number[] | null>(null);
+
+  const measure = () => {
+    const map = new Map<string, Pos>();
+    itemEls.current.forEach((el, key) =>
+      map.set(key, { top: el.offsetTop, left: el.offsetLeft }),
+    );
+    return map;
+  };
 
   // Enable auto-shuffle only on multi-column layouts and when motion is allowed.
   useEffect(() => {
@@ -100,35 +113,50 @@ export function Showcase() {
     };
   }, []);
 
-  // FLIP: animate any position changes between renders.
+  // FLIP: animate only when the order actually changes.
   useIsoLayoutEffect(() => {
+    if (lastOrder.current === null) {
+      positions.current = measure();
+      lastOrder.current = order;
+      return;
+    }
+    if (order === lastOrder.current) return;
+
+    const next = measure();
     itemEls.current.forEach((el, key) => {
-      const last = el.getBoundingClientRect();
-      const first = prevRects.current.get(key);
-      if (first) {
-        const dx = first.left - last.left;
-        const dy = first.top - last.top;
-        if (dx || dy) {
-          el.style.transition = "none";
-          el.style.transform = `translate(${dx}px, ${dy}px)`;
-          requestAnimationFrame(() => {
-            el.style.transition = "transform 750ms cubic-bezier(0.22, 1, 0.36, 1)";
-            el.style.transform = "";
-          });
-        }
-      }
-      prevRects.current.set(key, last);
+      const from = positions.current.get(key);
+      const to = next.get(key);
+      if (!from || !to) return;
+      const dx = from.left - to.left;
+      const dy = from.top - to.top;
+      if (!dx && !dy) return;
+
+      el.style.transition = "none";
+      el.style.transform = `translate(${dx}px, ${dy}px)`;
+      el.style.zIndex = "5";
+      requestAnimationFrame(() => {
+        el.style.transition = `transform ${SWAP_MS}ms cubic-bezier(0.65, 0, 0.35, 1)`;
+        el.style.transform = "";
+        const clear = () => {
+          el.style.zIndex = "";
+          el.removeEventListener("transitionend", clear);
+        };
+        el.addEventListener("transitionend", clear);
+      });
     });
+    positions.current = next;
+    lastOrder.current = order;
   });
 
-  // Keep stored rects fresh on resize so a later shuffle animates correctly.
+  // Re-baseline positions on resize so the next swap animates from the truth.
   useEffect(() => {
     const onResize = () => {
-      itemEls.current.forEach((el, key) => {
+      itemEls.current.forEach((el) => {
         el.style.transition = "none";
         el.style.transform = "";
-        prevRects.current.set(key, el.getBoundingClientRect());
+        el.style.zIndex = "";
       });
+      positions.current = measure();
     };
     window.addEventListener("resize", onResize, { passive: true });
     return () => window.removeEventListener("resize", onResize);
@@ -192,7 +220,7 @@ export function Showcase() {
                   else itemEls.current.delete(project.name);
                 }}
                 className={cn(
-                  "group relative min-h-[18rem] overflow-hidden rounded-2xl will-change-transform",
+                  "group relative min-h-[18rem] overflow-hidden rounded-2xl",
                   pos === 0 && "lg:row-span-2",
                 )}
               >
