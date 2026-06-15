@@ -15,14 +15,22 @@ import { cn } from "@/lib/utils";
  * collapses into a full-screen overlay menu.
  */
 export function SiteHeader() {
-  const [scrolled, setScrolled] = useState(false);
+  const [solid, setSolid] = useState(false);
   const [open, setOpen] = useState(false);
 
+  // Stay transparent over the (dark) hero; turn solid once it's scrolled past.
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    const onScroll = () => {
+      const hero = document.getElementById("top");
+      setSolid(hero ? hero.getBoundingClientRect().bottom <= 80 : window.scrollY > 24);
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener("resize", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
   }, []);
 
   // Lock background scroll and wire up Escape-to-close while the menu is open.
@@ -39,16 +47,15 @@ export function SiteHeader() {
     };
   }, [open]);
 
-  const solid = scrolled && !open;
+  const onLight = solid && !open;
 
   return (
     <header
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-colors duration-300",
-        open ? "text-cream" : "text-ink",
-        solid
-          ? "border-b border-ink/10 bg-cream/85 backdrop-blur-md"
-          : "border-b border-transparent",
+        onLight
+          ? "border-b border-ink/10 bg-cream/85 text-ink backdrop-blur-md"
+          : "border-b border-transparent text-cream",
       )}
     >
       <Container className="flex h-16 items-center justify-between gap-6 sm:h-[4.5rem]">
@@ -68,7 +75,10 @@ export function SiteHeader() {
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="relative py-1 text-ink/70 transition-colors duration-200 after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-0 after:bg-current after:transition-all after:duration-300 hover:text-ink hover:after:w-full"
+                  className={cn(
+                    "relative py-1 transition-colors duration-200 after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-0 after:bg-current after:transition-all after:duration-300 hover:after:w-full",
+                    onLight ? "text-ink/70 hover:text-ink" : "text-cream/80 hover:text-cream",
+                  )}
                 >
                   {item.label}
                 </Link>
@@ -80,7 +90,12 @@ export function SiteHeader() {
         <div className="flex items-center gap-3">
           <Link
             href="/#contact"
-            className="hidden items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-cream transition-colors duration-200 hover:bg-ink-soft lg:inline-flex"
+            className={cn(
+              "hidden items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors duration-200 lg:inline-flex",
+              onLight
+                ? "bg-ink text-cream hover:bg-ink-soft"
+                : "border border-cream/50 text-cream hover:bg-cream hover:text-ink",
+            )}
           >
             Start a project
             <IconArrowRight className="text-base" />

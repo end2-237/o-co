@@ -9,22 +9,27 @@ import { IconArrowDown, IconArrowRight } from "@/components/ui/icons";
 /**
  * Cinematic, scroll-driven hero.
  *
- * Before scroll the image sits centered as a rounded card (86vw × 64vh,
- * radius 16px, image zoomed to 1.15). The section is "pinned" for 140% of the
- * viewport height and scrubbed 1:1 with scroll: the card opens to fullscreen
- * (via an animated `clip-path` inset, radius → 0), the image de-zooms to 1,
- * a dark overlay fades in (from 25%) and an immersive headline rises in
- * (from 30%). Implemented with a sticky pin + scroll progress — no library.
+ * Before scroll the media sits centered as a rounded card (86vw × 64vh,
+ * radius 16px, zoomed to 1.15). The section is "pinned" for 140% of the
+ * viewport and scrubbed 1:1 with scroll: the card opens to fullscreen (via an
+ * animated `clip-path` inset, radius → 0), the media de-zooms to 1, a dark
+ * overlay fades in (from 25%) and an immersive headline rises in (from 30%).
+ *
+ * The background is a video that fades in and **starts playing once the card
+ * reaches fullscreen**, sitting over an optimized still image (instant first
+ * paint + graceful fallback). No animation library — a sticky pin + scroll
+ * progress, with prefers-reduced-motion falling back to the still end state.
  */
 
-// How far the section stays pinned, as a multiple of the viewport height.
-const PIN_RANGE = 1.4;
+const PIN_RANGE = 1.4; // section stays pinned for 140% of the viewport height
 
-// Progress thresholds for the layered reveals.
 const OVERLAY_START = 0.25;
 const OVERLAY_END = 0.62;
 const TEXT_START = 0.3;
 const TEXT_END = 0.78;
+const VIDEO_FADE_START = 0.8;
+const VIDEO_FADE_END = 0.96;
+const PLAY_AT = 0.88; // play the video once (near) fullscreen
 const HINT_END = 0.12;
 
 const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
@@ -33,10 +38,12 @@ const range = (p: number, a: number, b: number) => clamp01((p - a) / (b - a));
 export function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
-  const imageRef = useRef<HTMLDivElement>(null);
+  const mediaRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const hintRef = useRef<HTMLDivElement>(null);
+  const playingRef = useRef(false);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -47,8 +54,11 @@ export function Hero() {
       if (frameRef.current) {
         frameRef.current.style.clipPath = `inset(${18 * inset}vh ${7 * inset}vw round ${16 * inset}px)`;
       }
-      if (imageRef.current) {
-        imageRef.current.style.transform = `scale(${1.15 - 0.15 * p})`;
+      if (mediaRef.current) {
+        mediaRef.current.style.transform = `scale(${1.15 - 0.15 * p})`;
+      }
+      if (videoRef.current) {
+        videoRef.current.style.opacity = String(range(p, VIDEO_FADE_START, VIDEO_FADE_END));
       }
       if (overlayRef.current) {
         overlayRef.current.style.opacity = String(range(p, OVERLAY_START, OVERLAY_END));
@@ -63,20 +73,39 @@ export function Hero() {
       }
     };
 
+    const video = videoRef.current;
+    if (video) video.muted = true; // required for programmatic autoplay
+
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) {
-      // Skip the pin: show the fullscreen, fully-revealed end state.
+      // Show the fullscreen, fully-revealed end state — still image, no motion.
       section.style.height = "100svh";
       apply(1);
+      if (videoRef.current) videoRef.current.style.opacity = "0";
       return;
     }
 
     let raf = 0;
     const update = () => {
       raf = 0;
-      const total = section.offsetHeight - window.innerHeight;
-      const progress = total > 0 ? -section.getBoundingClientRect().top / total : 0;
-      apply(clamp01(progress));
+      const vh = window.innerHeight;
+      const rect = section.getBoundingClientRect();
+      const total = section.offsetHeight - vh;
+      const p = clamp01(total > 0 ? -rect.top / total : 0);
+      apply(p);
+
+      // Launch the video only while it's (near) fullscreen and on screen.
+      const onScreen = rect.bottom > 0 && rect.top < vh;
+      const shouldPlay = p >= PLAY_AT && onScreen;
+      if (video) {
+        if (shouldPlay && !playingRef.current) {
+          video.play().catch(() => {});
+          playingRef.current = true;
+        } else if (!shouldPlay && playingRef.current) {
+          video.pause();
+          playingRef.current = false;
+        }
+      }
     };
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(update);
@@ -97,7 +126,7 @@ export function Hero() {
       ref={sectionRef}
       id="top"
       aria-label="Introduction"
-      className="relative bg-cream"
+      className="relative bg-ink"
       style={{ height: `${(1 + PIN_RANGE) * 100}svh` }}
     >
       <div className="sticky top-0 h-svh w-full overflow-hidden">
@@ -108,10 +137,11 @@ export function Hero() {
           style={{ clipPath: "inset(18vh 7vw round 16px)" }}
         >
           <div
-            ref={imageRef}
+            ref={mediaRef}
             className="absolute inset-0 will-change-transform"
             style={{ transform: "scale(1.15)" }}
           >
+            {/* Instant base image (fast first paint + fallback) */}
             <Image
               src={heroImg}
               alt="A contemporary architect-designed home at twilight with warm interior lighting"
@@ -122,6 +152,20 @@ export function Hero() {
               sizes="100vw"
               className="object-cover object-center"
             />
+            {/* Video that fades in and plays at fullscreen */}
+            <video
+              ref={videoRef}
+              className="absolute inset-0 h-full w-full object-cover object-center"
+              style={{ opacity: 0 }}
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              aria-hidden
+              tabIndex={-1}
+            >
+              <source src="/videos/hero.mp4" type="video/mp4" />
+            </video>
           </div>
 
           {/* Darkening overlay (fades in mid-scroll) */}
@@ -139,8 +183,7 @@ export function Hero() {
             style={{ opacity: 0, transform: "translateY(40px)" }}
           >
             <p className="text-xs font-semibold uppercase tracking-[0.32em] text-cream/85 sm:text-sm">
-              O&amp;CO Homes — Architectural homes in {""}
-              <span className="whitespace-nowrap">Australia</span>
+              O&amp;CO Homes — Architectural homes in Australia
             </p>
             <h1 className="mt-6 max-w-4xl text-balance font-display text-[clamp(2.5rem,8vw,6.5rem)] font-light leading-[0.95] tracking-tight">
               Crafted to inspire <br className="hidden sm:block" />
@@ -164,11 +207,11 @@ export function Hero() {
           </div>
         </div>
 
-        {/* Scroll cue on the cream margin (fades out as the card opens) */}
+        {/* Scroll cue (fades out as the card opens) */}
         <div
           ref={hintRef}
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 bottom-6 flex flex-col items-center gap-2 text-ink/60"
+          className="pointer-events-none absolute inset-x-0 bottom-6 flex flex-col items-center gap-2 text-cream/65"
         >
           <span className="text-[0.7rem] font-medium uppercase tracking-[0.28em]">
             Scroll to explore
