@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import immersiveImg from "@/assets/images/immersive-home.jpg";
 import { Container } from "@/components/ui/Container";
+import { AssembleHeading } from "@/components/ui/AssembleHeading";
 import { IconArrowRight } from "@/components/ui/icons";
 
 /**
@@ -84,13 +85,11 @@ export function Immersive() {
             <span aria-hidden className="h-px w-10 bg-clay" />
             Find your new home
           </p>
-          <h2
+          <AssembleHeading
             id="immersive-heading"
-            className="reveal mt-6 text-balance font-display text-[clamp(2.25rem,6vw,5rem)] font-light leading-[1.03] tracking-tight"
-            style={{ animationDelay: "0.15s" }}
-          >
-            Home is the one place that should feel like you.
-          </h2>
+            text="Home is the one place that should feel like you."
+            className="mt-6 text-balance font-display text-[clamp(2.25rem,6vw,5rem)] font-light leading-[1.03] tracking-tight"
+          />
           <p
             className="reveal mt-7 max-w-xl text-pretty text-lg leading-relaxed text-cream/80"
             style={{ animationDelay: "0.3s" }}

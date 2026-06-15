@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import heroImg from "@/assets/images/hero-home.jpg";
@@ -13,23 +13,21 @@ import { IconArrowDown, IconArrowRight } from "@/components/ui/icons";
  * radius 16px, zoomed to 1.15). The section is "pinned" for 140% of the
  * viewport and scrubbed 1:1 with scroll: the card opens to fullscreen (via an
  * animated `clip-path` inset, radius → 0), the media de-zooms to 1, a dark
- * overlay fades in (from 25%) and an immersive headline rises in (from 30%).
+ * overlay fades in, the headline assembles letter by letter, and the video
+ * fades in and plays once the card reaches fullscreen.
  *
- * The background is a video that fades in and **starts playing once the card
- * reaches fullscreen**, sitting over an optimized still image (instant first
- * paint + graceful fallback). No animation library — a sticky pin + scroll
- * progress, with prefers-reduced-motion falling back to the still end state.
+ * No animation library — a sticky pin + scroll progress, with
+ * prefers-reduced-motion falling back to the revealed end state.
  */
 
-const PIN_RANGE = 1.4; // section stays pinned for 140% of the viewport height
+const HEADLINE = "Crafted to inspire your everyday.";
 
+const PIN_RANGE = 1.4; // section stays pinned for 140% of the viewport height
 const OVERLAY_START = 0.25;
 const OVERLAY_END = 0.62;
-const TEXT_START = 0.3;
-const TEXT_END = 0.78;
 const VIDEO_FADE_START = 0.8;
 const VIDEO_FADE_END = 0.96;
-const PLAY_AT = 0.88; // play the video once (near) fullscreen
+const PLAY_AT = 0.88;
 const HINT_END = 0.12;
 
 const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
@@ -41,13 +39,21 @@ export function Hero() {
   const mediaRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
-  const textRef = useRef<HTMLDivElement>(null);
+  const eyebrowRef = useRef<HTMLParagraphElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
   const hintRef = useRef<HTMLDivElement>(null);
   const playingRef = useRef(false);
 
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
+
+    const letters = headingRef.current
+      ? Array.from(headingRef.current.querySelectorAll<HTMLElement>("[data-letter]"))
+      : [];
+    const N = letters.length || 1;
+    const LW = 0.34; // per-letter reveal window (fraction of the text span)
 
     const apply = (p: number) => {
       const inset = 1 - p;
@@ -63,22 +69,41 @@ export function Hero() {
       if (overlayRef.current) {
         overlayRef.current.style.opacity = String(range(p, OVERLAY_START, OVERLAY_END));
       }
-      if (textRef.current) {
-        const t = range(p, TEXT_START, TEXT_END);
-        textRef.current.style.opacity = String(t);
-        textRef.current.style.transform = `translateY(${40 * (1 - t)}px)`;
+
+      // Eyebrow
+      const et = range(p, 0.24, 0.42);
+      if (eyebrowRef.current) {
+        eyebrowRef.current.style.opacity = String(et);
+        eyebrowRef.current.style.transform = `translateY(${(1 - et) * 16}px)`;
       }
+
+      // Headline — each letter assembles in turn as the card opens.
+      const tt = range(p, 0.3, 0.8);
+      for (let i = 0; i < letters.length; i++) {
+        const start = (i / N) * (1 - LW);
+        const lt = clamp01((tt - start) / LW);
+        const el = letters[i];
+        el.style.opacity = String(lt);
+        el.style.transform = `translateY(${(1 - lt) * 0.55}em)`;
+      }
+
+      // Call to action
+      const ct = range(p, 0.62, 0.84);
+      if (ctaRef.current) {
+        ctaRef.current.style.opacity = String(ct);
+        ctaRef.current.style.transform = `translateY(${(1 - ct) * 16}px)`;
+      }
+
       if (hintRef.current) {
         hintRef.current.style.opacity = String(clamp01(1 - p / HINT_END));
       }
     };
 
     const video = videoRef.current;
-    if (video) video.muted = true; // required for programmatic autoplay
+    if (video) video.muted = true;
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) {
-      // Show the fullscreen, fully-revealed end state — still image, no motion.
       section.style.height = "100svh";
       apply(1);
       if (videoRef.current) videoRef.current.style.opacity = "0";
@@ -94,7 +119,6 @@ export function Hero() {
       const p = clamp01(total > 0 ? -rect.top / total : 0);
       apply(p);
 
-      // Launch the video only while it's (near) fullscreen and on screen.
       const onScreen = rect.bottom > 0 && rect.top < vh;
       const shouldPlay = p >= PLAY_AT && onScreen;
       if (video) {
@@ -130,7 +154,6 @@ export function Hero() {
       style={{ height: `${(1 + PIN_RANGE) * 100}svh` }}
     >
       <div className="sticky top-0 h-svh w-full overflow-hidden">
-        {/* The opening card — a full-bleed frame clipped to a rounded window. */}
         <div
           ref={frameRef}
           className="absolute inset-0 [will-change:clip-path]"
@@ -141,10 +164,9 @@ export function Hero() {
             className="absolute inset-0 will-change-transform"
             style={{ transform: "scale(1.15)" }}
           >
-            {/* Instant base image (fast first paint + fallback) */}
             <Image
               src={heroImg}
-              alt="A contemporary architect-designed home at twilight with warm interior lighting"
+              alt="A contemporary architect-designed home with warm interior lighting"
               fill
               priority
               placeholder="blur"
@@ -152,7 +174,6 @@ export function Hero() {
               sizes="100vw"
               className="object-cover object-center"
             />
-            {/* Video that fades in and plays at fullscreen */}
             <video
               ref={videoRef}
               className="absolute inset-0 h-full w-full object-cover object-center"
@@ -168,7 +189,6 @@ export function Hero() {
             </video>
           </div>
 
-          {/* Darkening overlay (fades in mid-scroll) */}
           <div
             ref={overlayRef}
             aria-hidden
@@ -176,20 +196,44 @@ export function Hero() {
             style={{ backgroundColor: "rgba(0,0,0,0.45)", opacity: 0 }}
           />
 
-          {/* Immersive reveal */}
-          <div
-            ref={textRef}
-            className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center text-cream"
-            style={{ opacity: 0, transform: "translateY(40px)" }}
-          >
-            <p className="text-xs font-semibold uppercase tracking-[0.32em] text-cream/85 sm:text-sm">
+          <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center text-cream">
+            <p
+              ref={eyebrowRef}
+              className="text-xs font-semibold uppercase tracking-[0.32em] text-cream/85 sm:text-sm"
+              style={{ opacity: 0, transform: "translateY(16px)" }}
+            >
               O&amp;CO Homes — Architectural homes in Australia
             </p>
-            <h1 className="mt-6 max-w-4xl text-balance font-display text-[clamp(2.5rem,8vw,6.5rem)] font-light leading-[0.95] tracking-tight">
-              Crafted to inspire <br className="hidden sm:block" />
-              your everyday.
+
+            <h1
+              ref={headingRef}
+              aria-label={HEADLINE}
+              className="mt-6 max-w-4xl text-balance font-display text-[clamp(2.5rem,8vw,6.5rem)] font-light leading-[0.95] tracking-tight"
+            >
+              {HEADLINE.split(" ").map((word, wi, arr) => (
+                <Fragment key={wi}>
+                  <span className="inline-block whitespace-nowrap">
+                    {[...word].map((ch, ci) => (
+                      <span
+                        key={ci}
+                        data-letter
+                        className="inline-block will-change-transform"
+                        style={{ opacity: 0, transform: "translateY(0.55em)" }}
+                      >
+                        {ch}
+                      </span>
+                    ))}
+                  </span>
+                  {wi < arr.length - 1 ? " " : null}
+                </Fragment>
+              ))}
             </h1>
-            <div className="mt-10 flex flex-wrap items-center justify-center gap-5">
+
+            <div
+              ref={ctaRef}
+              className="mt-10 flex flex-wrap items-center justify-center gap-5"
+              style={{ opacity: 0, transform: "translateY(16px)" }}
+            >
               <Link
                 href="/#contact"
                 className="group inline-flex items-center gap-3 border border-cream/55 px-7 py-4 text-sm font-semibold uppercase tracking-[0.18em] transition-colors duration-300 hover:bg-cream hover:text-ink"
@@ -207,7 +251,6 @@ export function Hero() {
           </div>
         </div>
 
-        {/* Scroll cue (fades out as the card opens) */}
         <div
           ref={hintRef}
           aria-hidden
