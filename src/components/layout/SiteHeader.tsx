@@ -10,15 +10,14 @@ import { navItems, siteConfig } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 /**
- * Fixed site header. Sits transparently over the hero, then condenses to a
- * solid cream bar once the page scrolls. On small screens the navigation
+ * Fixed site header. Transparent over the light top of the hero, condensing to
+ * a solid cream bar once the page scrolls. On small screens the navigation
  * collapses into a full-screen overlay menu.
  */
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
-  // Flip to the solid treatment shortly after leaving the top of the page.
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
     onScroll();
@@ -40,30 +39,18 @@ export function SiteHeader() {
     };
   }, [open]);
 
-  const onLight = scrolled && !open;
+  const solid = scrolled && !open;
 
   return (
     <header
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-colors duration-300",
-        onLight
-          ? "border-b border-ink/10 bg-cream/85 text-ink backdrop-blur-md"
-          : "border-b border-transparent text-cream",
+        open ? "text-cream" : "text-ink",
+        solid
+          ? "border-b border-ink/10 bg-cream/85 backdrop-blur-md"
+          : "border-b border-transparent",
       )}
     >
-      {/* Utility strip — only at the very top, over the hero. */}
-      <div
-        className={cn(
-          "hidden overflow-hidden border-b border-cream/15 transition-all duration-300 lg:block",
-          scrolled || open ? "max-h-0 opacity-0" : "max-h-12 opacity-100",
-        )}
-      >
-        <Container className="flex h-10 items-center justify-between text-[0.7rem] font-medium uppercase tracking-[0.22em] text-cream/80">
-          <span>{siteConfig.region}</span>
-          <span>Since {siteConfig.foundingYear}</span>
-        </Container>
-      </div>
-
       <Container className="flex h-16 items-center justify-between gap-6 sm:h-[4.5rem]">
         <Link
           href="/"
@@ -81,10 +68,7 @@ export function SiteHeader() {
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className={cn(
-                    "relative py-1 transition-colors duration-200 after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-0 after:bg-current after:transition-all after:duration-300 hover:after:w-full",
-                    onLight ? "text-ink/70 hover:text-ink" : "text-cream/80 hover:text-cream",
-                  )}
+                  className="relative py-1 text-ink/70 transition-colors duration-200 after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-0 after:bg-current after:transition-all after:duration-300 hover:text-ink hover:after:w-full"
                 >
                   {item.label}
                 </Link>
@@ -96,12 +80,7 @@ export function SiteHeader() {
         <div className="flex items-center gap-3">
           <Link
             href="/#contact"
-            className={cn(
-              "hidden items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors duration-200 lg:inline-flex",
-              onLight
-                ? "bg-ink text-cream hover:bg-ink-soft"
-                : "border border-cream/40 text-cream hover:bg-cream hover:text-ink",
-            )}
+            className="hidden items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-cream transition-colors duration-200 hover:bg-ink-soft lg:inline-flex"
           >
             Start a project
             <IconArrowRight className="text-base" />
@@ -156,10 +135,7 @@ export function SiteHeader() {
             >
               {siteConfig.contact.email}
             </a>
-            <SocialLinks
-              className="text-cream/70"
-              iconClassName="text-xl"
-            />
+            <SocialLinks className="text-cream/70" iconClassName="text-xl" />
           </div>
         </Container>
       </div>
