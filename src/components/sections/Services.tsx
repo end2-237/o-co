@@ -29,7 +29,7 @@ const services = [
  */
 export function Services() {
   return (
-    <section id="homes" aria-labelledby="homes-heading" className="bg-bone py-24 sm:py-32">
+    <section id="services" aria-labelledby="services-heading" className="bg-bone py-24 sm:py-32">
       <Container>
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
@@ -38,7 +38,7 @@ export function Services() {
               What we build
             </p>
             <h2
-              id="homes-heading"
+              id="services-heading"
               className="mt-6 max-w-2xl text-balance font-display text-4xl font-light leading-tight tracking-tight text-ink sm:text-5xl"
             >
               Three ways to bring your home to life.
