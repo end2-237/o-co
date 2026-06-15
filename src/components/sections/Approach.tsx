@@ -76,7 +76,7 @@ export function Approach() {
             Our approach
           </p>
           <AssembleHeading
-            variant="words"
+            variant="blur"
             id="approach-heading"
             text="From first sketch to the day you move in."
             className="mt-6 max-w-xl text-balance font-display text-4xl font-light leading-tight tracking-tight text-ink sm:text-5xl"

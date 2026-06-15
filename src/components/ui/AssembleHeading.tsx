@@ -10,16 +10,26 @@ function rand(i: number, salt: number) {
   return x - Math.floor(x);
 }
 
-export type HeadingVariant = "recompose" | "mask" | "words" | "flip";
+const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ#%&/()=+*<>".split("");
+
+export type HeadingVariant =
+  | "recompose"
+  | "mask"
+  | "words"
+  | "flip"
+  | "scramble"
+  | "blur";
 
 /**
  * Heading with a choice of scroll-triggered entrance animations, so different
  * sections don't all animate the same way:
  *
  * - `recompose` — letters start scattered (from above) and reassemble.
- * - `mask`      — words slide up from behind a mask (overflow clip).
+ * - `mask`      — words slide up from behind a clip.
  * - `words`     — words fade + slide up, one after another.
  * - `flip`      — letters flip up in 3D.
+ * - `scramble`  — letters cycle random glyphs, then lock in (decode).
+ * - `blur`      — letters sharpen in from a blur.
  *
  * The settled text is the default render, so it stays readable without JS and
  * for reduced motion; an aria-label keeps it clean for screen readers.
@@ -43,42 +53,84 @@ export function AssembleHeading({
     const els = Array.from(root.querySelectorAll<HTMLElement>("[data-l]"));
     if (els.length === 0) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
     const N = els.length;
-    const isLetters = variant === "recompose" || variant === "flip";
-    const step = isLetters ? Math.min(30, 600 / N) : Math.min(85, 520 / N);
+
+    // Decode effect needs its own per-frame loop.
+    if (variant === "scramble") {
+      els.forEach((el) => {
+        const w = el.getBoundingClientRect().width;
+        el.dataset.final = el.textContent ?? "";
+        el.style.width = `${w}px`;
+        el.style.textAlign = "center";
+        el.style.opacity = "0";
+      });
+      let raf = 0;
+      let start = 0;
+      const tick = (now: number) => {
+        const t = now - start;
+        let busy = false;
+        els.forEach((el, i) => {
+          const s = i * 30;
+          const e = s + 440;
+          if (t < s) {
+            el.style.opacity = "0";
+            busy = true;
+          } else if (t < e) {
+            el.style.opacity = "1";
+            el.textContent = GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+            busy = true;
+          } else {
+            el.style.opacity = "1";
+            el.textContent = el.dataset.final ?? "";
+          }
+        });
+        if (busy) raf = requestAnimationFrame(tick);
+      };
+      let begun = false;
+      const io = new IntersectionObserver(
+        (entries) => {
+          if (begun || !entries.some((en) => en.isIntersecting)) return;
+          begun = true;
+          start = performance.now();
+          raf = requestAnimationFrame(tick);
+          io.disconnect();
+        },
+        { threshold: 0.3 },
+      );
+      io.observe(root);
+      return () => {
+        io.disconnect();
+        if (raf) cancelAnimationFrame(raf);
+      };
+    }
+
+    const isLetters = variant !== "mask" && variant !== "words";
+    const step = isLetters ? Math.min(28, 560 / N) : Math.min(85, 520 / N);
 
     const setState = (el: HTMLElement, i: number, phase: "init" | "in") => {
+      const on = phase === "in";
       switch (variant) {
         case "recompose":
-          if (phase === "init") {
-            el.style.opacity = "0";
-            el.style.transform = `translate(${(rand(i, 1) * 2 - 1) * 42}px, ${-34 - rand(i, 2) * 72}px) rotate(${(rand(i, 3) * 2 - 1) * 18}deg)`;
-          } else {
-            el.style.opacity = "1";
-            el.style.transform = "translate(0,0) rotate(0deg)";
-          }
+          el.style.opacity = on ? "1" : "0";
+          el.style.transform = on
+            ? "translate(0,0) rotate(0deg)"
+            : `translate(${(rand(i, 1) * 2 - 1) * 42}px, ${-34 - rand(i, 2) * 72}px) rotate(${(rand(i, 3) * 2 - 1) * 18}deg)`;
           break;
         case "flip":
-          if (phase === "init") {
-            el.style.opacity = "0";
-            el.style.transform = "rotateX(-90deg)";
-          } else {
-            el.style.opacity = "1";
-            el.style.transform = "none";
-          }
+          el.style.opacity = on ? "1" : "0";
+          el.style.transform = on ? "none" : "rotateX(-90deg)";
+          break;
+        case "blur":
+          el.style.opacity = on ? "1" : "0";
+          el.style.filter = on ? "blur(0px)" : "blur(10px)";
+          el.style.transform = on ? "none" : "translateY(0.16em)";
           break;
         case "mask":
-          el.style.transform = phase === "init" ? "translateY(110%)" : "translateY(0)";
+          el.style.transform = on ? "translateY(0)" : "translateY(110%)";
           break;
         default: // words
-          if (phase === "init") {
-            el.style.opacity = "0";
-            el.style.transform = "translateY(0.6em)";
-          } else {
-            el.style.opacity = "1";
-            el.style.transform = "none";
-          }
+          el.style.opacity = on ? "1" : "0";
+          el.style.transform = on ? "none" : "translateY(0.6em)";
       }
     };
 
@@ -89,6 +141,8 @@ export function AssembleHeading({
           return `transform 900ms cubic-bezier(0.16,1,0.3,1) ${d}ms, opacity 600ms ease ${d}ms`;
         case "flip":
           return `transform 750ms cubic-bezier(0.2,0.7,0.2,1) ${d}ms, opacity 400ms ease ${d}ms`;
+        case "blur":
+          return `filter 700ms ease ${d}ms, opacity 600ms ease ${d}ms, transform 700ms ease ${d}ms`;
         case "mask":
           return `transform 850ms cubic-bezier(0.16,1,0.3,1) ${d}ms`;
         default:

@@ -114,7 +114,7 @@ export function Reels() {
               @ocohomes
             </p>
             <AssembleHeading
-              variant="mask"
+              variant="scramble"
               id="social-heading"
               text="Inside our builds, in sixty seconds."
               className="mt-6 max-w-2xl text-balance font-display text-4xl font-light leading-tight tracking-tight sm:text-5xl"
