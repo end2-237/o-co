@@ -1,0 +1,129 @@
+@import "tailwindcss";
+
+/*
+ * O&CO Homes design tokens.
+ * Palette is drawn from the brand mark: deep navy ink on warm sand/cream.
+ * Tailwind v4 reads `--color-*` / `--font-*` from @theme and generates the
+ * matching utilities (e.g. `bg-ink`, `text-cream`, `font-display`).
+ */
+@theme {
+  --color-ink: #14233b;
+  --color-ink-soft: #20355a;
+  --color-ink-muted: #41577d;
+  --color-sand: #d8cebf;
+  --color-sand-soft: #e7e0d4;
+  --color-cream: #f4f0e8;
+  --color-bone: #faf8f3;
+  --color-clay: #b3764c;
+
+  --font-display: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  :root {
+    /* Height reserved for the fixed header, used for anchor scroll offset. */
+    --header-h: 5.5rem;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: var(--header-h);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-cream);
+    color: var(--color-ink);
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: var(--color-ink);
+    color: var(--color-cream);
+  }
+
+  :where(a, button, input, [tabindex]):focus-visible {
+    outline: 2px solid var(--color-clay);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  /* Light, outlined display word — echoes the reference hero typography. */
+  .text-outline {
+    color: transparent;
+    -webkit-text-stroke: 1.25px color-mix(in srgb, var(--color-cream) 80%, transparent);
+  }
+  @supports not (-webkit-text-stroke: 1px black) {
+    .text-outline {
+      color: color-mix(in srgb, var(--color-cream) 82%, transparent);
+    }
+  }
+}
+
+/* Seamless logo / keyword marquee (two copies translated by -50%). */
+@keyframes oco-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.animate-marquee {
+  animation: oco-marquee 38s linear infinite;
+}
+
+/* Subtle staggered entrance for hero content. */
+@keyframes oco-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.reveal {
+  opacity: 0;
+  animation: oco-reveal 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes oco-scroll-cue {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translateY(6px);
+    opacity: 1;
+  }
+}
+.animate-scroll-cue {
+  animation: oco-scroll-cue 2s ease-in-out infinite;
+}
