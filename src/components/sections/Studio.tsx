@@ -26,6 +26,7 @@ export function Studio() {
             The studio
           </p>
           <AssembleHeading
+            variant="words"
             id="studio-heading"
             text="We design and build the home you'll actually live in."
             className="mt-6 max-w-xl text-balance font-display text-4xl font-light leading-tight tracking-tight text-ink sm:text-5xl"

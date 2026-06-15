@@ -194,6 +194,7 @@ export function Showcase() {
               Selected homes
             </p>
             <AssembleHeading
+              variant="mask"
               id="homes-heading"
               text="A portfolio you can picture yourself living in."
               className="mt-6 max-w-2xl text-balance font-display text-4xl font-light leading-tight tracking-tight text-ink sm:text-5xl"

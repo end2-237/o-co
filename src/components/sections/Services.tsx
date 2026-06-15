@@ -42,6 +42,7 @@ export function Services() {
               What we build
             </p>
             <AssembleHeading
+              variant="flip"
               id="services-heading"
               text="Three ways to bring your home to life."
               className="mt-6 max-w-2xl text-balance font-display text-4xl font-light leading-tight tracking-tight text-ink sm:text-5xl"
