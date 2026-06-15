@@ -128,6 +128,134 @@ export function IconArrowDown(props: IconProps) {
   );
 }
 
+export function IconHeart(props: IconProps) {
+  return (
+    <Base {...props}>
+      <path
+        fill="currentColor"
+        d="M12 21s-6.716-4.297-9.33-8.04C1.06 10.5 1.64 7.5 4.02 6.21c1.9-1.03 3.92-.34 5.04 1.16.18.24.5.24.68 0 1.12-1.5 3.14-2.19 5.04-1.16 2.38 1.29 2.96 4.29 1.35 6.75C18.716 16.703 12 21 12 21Z"
+      />
+    </Base>
+  );
+}
+
+export function IconComment(props: IconProps) {
+  return (
+    <Base {...props}>
+      <path
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinejoin="round"
+        d="M21 11.5a8.5 8.5 0 0 1-12.5 7.5L3.5 20.5l1.5-4.8A8.5 8.5 0 1 1 21 11.5Z"
+      />
+    </Base>
+  );
+}
+
+export function IconShare(props: IconProps) {
+  return (
+    <Base {...props}>
+      <path
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M12 15V3m0 0L8 7m4-4 4 4M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"
+      />
+    </Base>
+  );
+}
+
+export function IconMusic(props: IconProps) {
+  return (
+    <Base {...props}>
+      <path
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M9 17V5l11-2v12"
+      />
+      <circle cx="6" cy="17.5" r="2.5" stroke="currentColor" strokeWidth="1.7" />
+      <circle cx="17" cy="15.5" r="2.5" stroke="currentColor" strokeWidth="1.7" />
+    </Base>
+  );
+}
+
+export function IconSound(props: IconProps) {
+  return (
+    <Base {...props}>
+      <path
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinejoin="round"
+        d="M4 9v6h4l5 4V5L8 9H4Z"
+      />
+      <path
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        d="M16 8.5a5 5 0 0 1 0 7M18.7 6a8.5 8.5 0 0 1 0 12"
+      />
+    </Base>
+  );
+}
+
+export function IconMuted(props: IconProps) {
+  return (
+    <Base {...props}>
+      <path
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinejoin="round"
+        d="M4 9v6h4l5 4V5L8 9H4Z"
+      />
+      <path
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        d="m16 9.5 5 5m0-5-5 5"
+      />
+    </Base>
+  );
+}
+
+export function IconChevronUp(props: IconProps) {
+  return (
+    <Base {...props}>
+      <path
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="m6 15 6-6 6 6"
+      />
+    </Base>
+  );
+}
+
+export function IconChevronDown(props: IconProps) {
+  return (
+    <Base {...props}>
+      <path
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="m6 9 6 6 6-6"
+      />
+    </Base>
+  );
+}
+
+export function IconPlay(props: IconProps) {
+  return (
+    <Base {...props}>
+      <path fill="currentColor" d="M8 5.14v13.72a1 1 0 0 0 1.54.84l10.5-6.86a1 1 0 0 0 0-1.68L9.54 4.3A1 1 0 0 0 8 5.14Z" />
+    </Base>
+  );
+}
+
 export const socialIcons = {
   facebook: IconFacebook,
   instagram: IconInstagram,
