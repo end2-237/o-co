@@ -1,7 +1,11 @@
+"use client";
+
+import { useState } from "react";
 import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { IconArrowRight } from "@/components/ui/icons";
+import { Lightbox, type LightboxItem } from "@/components/sections/Lightbox";
 import { cn } from "@/lib/utils";
 import coastal from "@/assets/images/home-coastal.jpg";
 import living from "@/assets/images/home-living.jpg";
@@ -58,10 +62,12 @@ const projects: Project[] = [
 ];
 
 /**
- * Home showcase — an editorial gallery of selected projects. The first card is
- * a tall feature; the rest form a balanced grid with hover-zoom imagery.
+ * Home showcase — an editorial gallery of selected projects. Clicking a card
+ * opens a fullscreen lightbox with a cloth/drape distortion reveal.
  */
 export function Showcase() {
+  const [active, setActive] = useState<{ item: LightboxItem; rect: DOMRect } | null>(null);
+
   return (
     <section id="homes" aria-labelledby="homes-heading" className="bg-cream py-24 sm:py-32">
       <Container>
@@ -106,9 +112,26 @@ export function Showcase() {
               />
               <div
                 aria-hidden
-                className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/15 to-transparent"
+                className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/15 to-transparent"
               />
-              <div className="absolute inset-x-0 bottom-0 p-6 text-cream sm:p-7">
+              <button
+                type="button"
+                aria-label={`View ${project.name}, ${project.location}`}
+                onClick={(e) =>
+                  setActive({
+                    item: {
+                      src: project.img.src,
+                      alt: project.alt,
+                      name: project.name,
+                      location: project.location,
+                      type: project.type,
+                    },
+                    rect: e.currentTarget.getBoundingClientRect(),
+                  })
+                }
+                className="absolute inset-0 z-10 cursor-pointer"
+              />
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 p-6 text-cream sm:p-7">
                 <span className="inline-block rounded-full border border-cream/40 px-3 py-1 text-[0.65rem] font-medium uppercase tracking-[0.16em] text-cream/90">
                   {project.type}
                 </span>
@@ -121,6 +144,10 @@ export function Showcase() {
           ))}
         </ul>
       </Container>
+
+      {active && (
+        <Lightbox item={active.item} rect={active.rect} onClose={() => setActive(null)} />
+      )}
     </section>
   );
 }
