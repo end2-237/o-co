@@ -1,4 +1,5 @@
 import { Container } from "@/components/ui/Container";
+import { AssembleHeading } from "@/components/ui/AssembleHeading";
 import { siteConfig } from "@/lib/site";
 
 const stats = [
@@ -17,20 +18,22 @@ export function Studio() {
     <section id="studio" aria-labelledby="studio-heading" className="bg-cream py-24 sm:py-32">
       <Container className="grid gap-16 lg:grid-cols-2 lg:gap-24">
         <div>
-          <p className="flex items-center gap-4 text-xs font-semibold uppercase tracking-[0.28em] text-clay">
+          <p
+            data-reveal
+            className="flex items-center gap-4 text-xs font-semibold uppercase tracking-[0.28em] text-clay"
+          >
             <span aria-hidden className="h-px w-10 bg-clay" />
             The studio
           </p>
-          <h2
+          <AssembleHeading
             id="studio-heading"
+            text="We design and build the home you'll actually live in."
             className="mt-6 max-w-xl text-balance font-display text-4xl font-light leading-tight tracking-tight text-ink sm:text-5xl"
-          >
-            We design and build the home you&apos;ll actually live in.
-          </h2>
+          />
         </div>
 
         <div className="flex flex-col gap-10">
-          <p className="text-pretty text-lg leading-relaxed text-ink/70">
+          <p data-reveal className="text-pretty text-lg leading-relaxed text-ink/70">
             O&amp;CO Homes is an architect-led builder working across {siteConfig.country}.
             We bring design and construction under one roof, so the considered
             details survive the journey from sketch to handover. Every project
@@ -39,8 +42,8 @@ export function Studio() {
           </p>
 
           <dl className="grid grid-cols-2 gap-x-8 gap-y-10 border-t border-ink/10 pt-10">
-            {stats.map((stat) => (
-              <div key={stat.label}>
+            {stats.map((stat, i) => (
+              <div key={stat.label} data-reveal data-reveal-delay={i * 90}>
                 <dt className="sr-only">{stat.label}</dt>
                 <dd>
                   <span className="block font-display text-3xl font-semibold text-ink sm:text-4xl">

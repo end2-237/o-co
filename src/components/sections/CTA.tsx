@@ -1,4 +1,5 @@
 import { Container } from "@/components/ui/Container";
+import { AssembleHeading } from "@/components/ui/AssembleHeading";
 import { IconArrowRight } from "@/components/ui/icons";
 import { siteConfig } from "@/lib/site";
 
@@ -15,17 +16,22 @@ export function CTA() {
     >
       <Container className="grid gap-14 lg:grid-cols-[1.15fr_1fr] lg:items-end">
         <div>
-          <p className="flex items-center gap-4 text-xs font-semibold uppercase tracking-[0.28em] text-clay">
+          <p
+            data-reveal
+            className="flex items-center gap-4 text-xs font-semibold uppercase tracking-[0.28em] text-clay"
+          >
             <span aria-hidden className="h-px w-10 bg-clay" />
             Start a project
           </p>
-          <h2
+          <AssembleHeading
             id="contact-heading"
+            text="Let's build something considered."
             className="mt-6 max-w-2xl text-balance font-display text-4xl font-light leading-tight tracking-tight sm:text-6xl"
+          />
+          <p
+            data-reveal
+            className="mt-6 max-w-lg text-pretty text-lg leading-relaxed text-cream/75"
           >
-            Let&apos;s build something considered.
-          </h2>
-          <p className="mt-6 max-w-lg text-pretty text-lg leading-relaxed text-cream/75">
             Tell us about your site and the home you have in mind. We take on a
             limited number of projects each year so every client gets our full
             attention.
@@ -33,6 +39,7 @@ export function CTA() {
 
           <a
             href={`mailto:${siteConfig.contact.email}`}
+            data-reveal
             className="group mt-10 inline-flex items-center gap-3 bg-cream px-7 py-4 text-sm font-semibold uppercase tracking-[0.18em] text-ink transition-colors duration-300 hover:bg-sand"
           >
             Email the studio
@@ -40,7 +47,11 @@ export function CTA() {
           </a>
         </div>
 
-        <dl className="grid gap-8 border-t border-cream/15 pt-10 sm:grid-cols-2 lg:border-l lg:border-t-0 lg:pl-12 lg:pt-0">
+        <dl
+          data-reveal
+          data-reveal-delay={120}
+          className="grid gap-8 border-t border-cream/15 pt-10 sm:grid-cols-2 lg:border-l lg:border-t-0 lg:pl-12 lg:pt-0"
+>
           <div>
             <dt className="text-xs uppercase tracking-[0.2em] text-cream/50">Email</dt>
             <dd className="mt-2">

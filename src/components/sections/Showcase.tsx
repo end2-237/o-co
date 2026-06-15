@@ -11,6 +11,7 @@ import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { IconArrowRight } from "@/components/ui/icons";
 import { Lightbox, type LightboxItem } from "@/components/sections/Lightbox";
+import { AssembleHeading } from "@/components/ui/AssembleHeading";
 import { cn } from "@/lib/utils";
 import coastal from "@/assets/images/home-coastal.jpg";
 import living from "@/assets/images/home-living.jpg";
@@ -185,19 +186,22 @@ export function Showcase() {
       <Container>
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="flex items-center gap-4 text-xs font-semibold uppercase tracking-[0.28em] text-clay">
+            <p
+              data-reveal
+              className="flex items-center gap-4 text-xs font-semibold uppercase tracking-[0.28em] text-clay"
+            >
               <span aria-hidden className="h-px w-10 bg-clay" />
               Selected homes
             </p>
-            <h2
+            <AssembleHeading
               id="homes-heading"
+              text="A portfolio you can picture yourself living in."
               className="mt-6 max-w-2xl text-balance font-display text-4xl font-light leading-tight tracking-tight text-ink sm:text-5xl"
-            >
-              A portfolio you can picture yourself living in.
-            </h2>
+            />
           </div>
           <Link
             href="/#contact"
+            data-reveal
             className="group inline-flex items-center gap-2 self-start text-sm font-semibold uppercase tracking-[0.16em] text-ink transition-colors hover:text-clay md:self-auto"
           >
             Start your project

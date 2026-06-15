@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Container } from "@/components/ui/Container";
+import { AssembleHeading } from "@/components/ui/AssembleHeading";
 import { ReelsPlayer, type Reel } from "@/components/sections/ReelsPlayer";
 import {
   IconArrowRight,
@@ -105,23 +106,28 @@ export function Reels() {
       <Container>
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="flex items-center gap-4 text-xs font-semibold uppercase tracking-[0.28em] text-clay">
+            <p
+              data-reveal
+              className="flex items-center gap-4 text-xs font-semibold uppercase tracking-[0.28em] text-clay"
+            >
               <span aria-hidden className="h-px w-10 bg-clay" />
               @ocohomes
             </p>
-            <h2
+            <AssembleHeading
               id="social-heading"
+              text="Inside our builds, in sixty seconds."
               className="mt-6 max-w-2xl text-balance font-display text-4xl font-light leading-tight tracking-tight sm:text-5xl"
+            />
+            <p
+              data-reveal
+              className="mt-5 max-w-md text-pretty leading-relaxed text-cream/70"
             >
-              Inside our builds, in sixty seconds.
-            </h2>
-            <p className="mt-5 max-w-md text-pretty leading-relaxed text-cream/70">
               Site walk-throughs, reveals and the moments in between. Tap a clip
               to watch full screen.
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div data-reveal data-reveal-delay={120} className="flex items-center gap-3">
             <a
               href={TIKTOK_URL}
               target="_blank"
@@ -154,6 +160,7 @@ export function Reels() {
 
         <ul
           ref={rowRef}
+          data-reveal
           className="mt-12 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {reels.map((reel, i) => (

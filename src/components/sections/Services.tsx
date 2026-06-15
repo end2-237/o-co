@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
+import { AssembleHeading } from "@/components/ui/AssembleHeading";
 import { IconArrowRight } from "@/components/ui/icons";
 
 const services = [
@@ -33,20 +34,25 @@ export function Services() {
       <Container>
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="flex items-center gap-4 text-xs font-semibold uppercase tracking-[0.28em] text-clay">
+            <p
+              data-reveal
+              className="flex items-center gap-4 text-xs font-semibold uppercase tracking-[0.28em] text-clay"
+            >
               <span aria-hidden className="h-px w-10 bg-clay" />
               What we build
             </p>
-            <h2
+            <AssembleHeading
               id="services-heading"
+              text="Three ways to bring your home to life."
               className="mt-6 max-w-2xl text-balance font-display text-4xl font-light leading-tight tracking-tight text-ink sm:text-5xl"
-            >
-              Three ways to bring your home to life.
-            </h2>
+            />
           </div>
         </div>
 
-        <ul className="mt-16 grid gap-px overflow-hidden rounded-2xl border border-ink/10 bg-ink/10 sm:grid-cols-2 lg:grid-cols-3">
+        <ul
+          data-reveal
+          className="mt-16 grid gap-px overflow-hidden rounded-2xl border border-ink/10 bg-ink/10 sm:grid-cols-2 lg:grid-cols-3"
+>
           {services.map((service) => (
             <li
               key={service.no}

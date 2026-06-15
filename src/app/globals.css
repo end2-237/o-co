@@ -127,3 +127,14 @@
 .animate-scroll-cue {
   animation: oco-scroll-cue 2s ease-in-out infinite;
 }
+
+/* Scroll-triggered reveals (initial hidden state is applied by JS, so content
+   stays visible without JS and for reduced motion). */
+[data-reveal] {
+  transition:
+    opacity 0.7s ease,
+    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+    color 0.3s ease,
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+}

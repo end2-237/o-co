@@ -79,8 +79,8 @@ export function Immersive() {
       <Container className="relative z-10 py-28">
         <div className="max-w-3xl">
           <p
-            className="reveal flex items-center gap-4 text-xs font-semibold uppercase tracking-[0.3em] text-cream/85"
-            style={{ animationDelay: "0.05s" }}
+            data-reveal
+            className="flex items-center gap-4 text-xs font-semibold uppercase tracking-[0.3em] text-cream/85"
           >
             <span aria-hidden className="h-px w-10 bg-clay" />
             Find your new home
@@ -91,16 +91,18 @@ export function Immersive() {
             className="mt-6 text-balance font-display text-[clamp(2.25rem,6vw,5rem)] font-light leading-[1.03] tracking-tight"
           />
           <p
-            className="reveal mt-7 max-w-xl text-pretty text-lg leading-relaxed text-cream/80"
-            style={{ animationDelay: "0.3s" }}
+            data-reveal
+            data-reveal-delay={120}
+            className="mt-7 max-w-xl text-pretty text-lg leading-relaxed text-cream/80"
           >
             From the first light in the kitchen to the hush of the last room at
             night, we design for the moments you&apos;ll actually live — the
             quiet, ordinary, irreplaceable ones.
           </p>
           <div
-            className="reveal mt-10 flex flex-wrap items-center gap-5"
-            style={{ animationDelay: "0.45s" }}
+            data-reveal
+            data-reveal-delay={220}
+            className="mt-10 flex flex-wrap items-center gap-5"
           >
             <Link
               href="/#homes"

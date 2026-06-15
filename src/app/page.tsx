@@ -7,6 +7,7 @@ import { Services } from "@/components/sections/Services";
 import { Reels } from "@/components/sections/Reels";
 import { Approach } from "@/components/sections/Approach";
 import { CTA } from "@/components/sections/CTA";
+import { Reveals } from "@/components/ui/Reveals";
 
 /**
  * O&CO Homes landing page. The cinematic hero leads into an immersive,
@@ -25,6 +26,7 @@ export default function HomePage() {
       <Reels />
       <Approach />
       <CTA />
+      <Reveals />
     </>
   );
 }
