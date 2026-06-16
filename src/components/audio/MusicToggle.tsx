@@ -1,12 +1,13 @@
 "use client";
 
 import { useMusic } from "@/components/audio/MusicProvider";
-import { IconMusic } from "@/components/ui/icons";
 import { cn } from "@/lib/utils";
 
+const STATIC_HEIGHTS = ["40%", "75%", "55%", "90%"];
+
 /**
- * Nav music control. Shows the track and an animated equalizer while playing;
- * click to play/stop.
+ * Minimal nav music control: an animated wave (equalizer) icon — no label.
+ * Bars dance while playing, sit still when stopped. Click to play / stop.
  */
 export function MusicToggle({
   playLabel,
@@ -17,7 +18,7 @@ export function MusicToggle({
   pauseLabel: string;
   className?: string;
 }) {
-  const { playing, toggle, title } = useMusic();
+  const { playing, toggle } = useMusic();
 
   return (
     <button
@@ -25,26 +26,27 @@ export function MusicToggle({
       onClick={toggle}
       aria-label={playing ? pauseLabel : playLabel}
       aria-pressed={playing}
-      title={title}
       className={cn(
-        "group inline-flex items-center gap-2 rounded-full border border-current/25 px-3 py-1.5 text-xs font-medium transition-colors hover:border-current/50",
+        "inline-flex h-10 w-10 items-center justify-center rounded-full border border-current/25 transition-colors hover:border-current/50",
         className,
       )}
     >
-      {playing ? (
-        <span aria-hidden className="flex h-3 items-end gap-[2px]">
-          {[0, 1, 2].map((i) => (
-            <span
-              key={i}
-              className="eq-bar w-[2px] bg-current"
-              style={{ height: "100%", animationDelay: `${i * 0.18}s` }}
-            />
-          ))}
-        </span>
-      ) : (
-        <IconMusic aria-hidden className="text-sm" />
-      )}
-      <span className="hidden max-w-[8rem] truncate tracking-wide sm:inline">{title}</span>
+      <span
+        aria-hidden
+        className={cn("flex h-3.5 items-end gap-[2.5px]", !playing && "opacity-50")}
+      >
+        {[0, 1, 2, 3].map((i) => (
+          <span
+            key={i}
+            className={cn("w-[2px] rounded-full bg-current", playing && "eq-bar")}
+            style={
+              playing
+                ? { height: "100%", animationDelay: `${i * 0.15}s` }
+                : { height: STATIC_HEIGHTS[i] }
+            }
+          />
+        ))}
+      </span>
     </button>
   );
 }
