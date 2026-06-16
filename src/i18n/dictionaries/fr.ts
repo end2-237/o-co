@@ -357,5 +357,7 @@ export const fr: Dictionary = {
     switchLanguage: "Changer de langue",
     skipToContent: "Aller au contenu",
     home: "accueil",
+    playMusic: "Lancer la musique",
+    pauseMusic: "Couper la musique",
   },
 };

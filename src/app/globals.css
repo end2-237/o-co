@@ -128,6 +128,21 @@
   animation: oco-scroll-cue 2s ease-in-out infinite;
 }
 
+/* Music toggle equalizer bars. */
+@keyframes oco-eq {
+  0%,
+  100% {
+    transform: scaleY(0.3);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+.eq-bar {
+  transform-origin: bottom;
+  animation: oco-eq 0.9s ease-in-out infinite;
+}
+
 /* Scroll-triggered reveals (initial hidden state is applied by JS, so content
    stays visible without JS and for reduced motion). */
 [data-reveal] {

@@ -6,6 +6,7 @@ import { Container } from "@/components/ui/Container";
 import { Logo } from "@/components/ui/Logo";
 import { SocialLinks } from "@/components/ui/SocialLinks";
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
+import { MusicToggle } from "@/components/audio/MusicToggle";
 import { IconArrowRight, IconClose, IconMenu } from "@/components/ui/icons";
 import { siteConfig } from "@/lib/site";
 import type { Locale } from "@/i18n/config";
@@ -100,7 +101,8 @@ export function SiteHeader({
           </ul>
         </nav>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <MusicToggle playLabel={a11y.playMusic} pauseLabel={a11y.pauseMusic} />
           <LanguageSwitcher
             locale={locale}
             label={a11y.switchLanguage}

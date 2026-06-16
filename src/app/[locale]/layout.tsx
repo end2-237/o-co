@@ -4,6 +4,7 @@ import { Inter, Poppins } from "next/font/google";
 import "../globals.css";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
+import { MusicProvider } from "@/components/audio/MusicProvider";
 import { buildJsonLd } from "@/lib/jsonld";
 import { siteConfig } from "@/lib/site";
 import { getDictionary } from "@/i18n/get-dictionary";
@@ -115,17 +116,19 @@ export default async function LocaleLayout({
           {dict.a11y.skipToContent}
         </a>
 
-        <SiteHeader
-          locale={locale}
-          nav={dict.nav}
-          cta={dict.header.cta}
-          a11y={dict.a11y}
-          email={siteConfig.contact.email}
-        />
-        <main id="main" className="flex-1">
-          {children}
-        </main>
-        <SiteFooter locale={locale} t={dict.footer} nav={dict.nav} areas={dict.areas.list} />
+        <MusicProvider src="/audio/woman-glow.mp3" title="Woman's Glow">
+          <SiteHeader
+            locale={locale}
+            nav={dict.nav}
+            cta={dict.header.cta}
+            a11y={dict.a11y}
+            email={siteConfig.contact.email}
+          />
+          <main id="main" className="flex-1">
+            {children}
+          </main>
+          <SiteFooter locale={locale} t={dict.footer} nav={dict.nav} areas={dict.areas.list} />
+        </MusicProvider>
 
         <script
           type="application/ld+json"

@@ -355,6 +355,8 @@ export const en = {
     switchLanguage: "Switch language",
     skipToContent: "Skip to content",
     home: "home",
+    playMusic: "Play music",
+    pauseMusic: "Pause music",
   },
 };
 
