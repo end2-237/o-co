@@ -1,18 +1,10 @@
-const keywords = [
-  "Custom Homes",
-  "Knockdown & Rebuild",
-  "Architectural Design",
-  "Luxury Interiors",
-  "Sustainable Building",
-  "Coastal Residences",
-];
+import type { Dictionary } from "@/i18n/dictionaries/en";
 
 /**
- * Infinite keyword marquee separating the hero from the page body. The track
- * holds two identical lists and is translated by -50%, so the loop is seamless.
- * Motion is paused automatically for users who prefer reduced motion.
+ * Infinite keyword marquee. The track holds two identical lists translated by
+ * -50% for a seamless loop; motion pauses for reduced-motion users.
  */
-export function Marquee() {
+export function Marquee({ items }: { items: Dictionary["marquee"] }) {
   return (
     <section
       aria-label="What we do"
@@ -20,12 +12,8 @@ export function Marquee() {
     >
       <div className="flex w-max animate-marquee">
         {[0, 1].map((copy) => (
-          <ul
-            key={copy}
-            aria-hidden={copy === 1}
-            className="flex items-center"
-          >
-            {keywords.map((word) => (
+          <ul key={copy} aria-hidden={copy === 1} className="flex items-center">
+            {items.map((word) => (
               <li
                 key={word}
                 className="flex items-center whitespace-nowrap font-display text-sm font-medium uppercase tracking-[0.2em] text-cream/85"

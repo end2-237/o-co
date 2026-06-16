@@ -256,9 +256,21 @@ export function IconPlay(props: IconProps) {
   );
 }
 
+export function IconTiktok(props: IconProps) {
+  return (
+    <Base {...props}>
+      <path
+        fill="currentColor"
+        d="M16.5 3c.32 2.04 1.64 3.5 3.5 3.78v2.45c-1.27 0-2.46-.4-3.5-1.08v5.55c0 2.93-2.38 5.3-5.3 5.3-2.93 0-5.3-2.37-5.3-5.3 0-2.74 2.07-5 4.73-5.27v2.5a2.78 2.78 0 1 0 3.37 2.72V3h2.5Z"
+      />
+    </Base>
+  );
+}
+
 export const socialIcons = {
-  facebook: IconFacebook,
+  tiktok: IconTiktok,
   instagram: IconInstagram,
+  facebook: IconFacebook,
   linkedin: IconLinkedin,
   pinterest: IconPinterest,
 } as const;

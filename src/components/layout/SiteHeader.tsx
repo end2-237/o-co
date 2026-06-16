@@ -5,20 +5,35 @@ import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { Logo } from "@/components/ui/Logo";
 import { SocialLinks } from "@/components/ui/SocialLinks";
+import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
 import { IconArrowRight, IconClose, IconMenu } from "@/components/ui/icons";
-import { navItems, siteConfig } from "@/lib/site";
+import { siteConfig } from "@/lib/site";
+import type { Locale } from "@/i18n/config";
+import type { Dictionary } from "@/i18n/dictionaries/en";
 import { cn } from "@/lib/utils";
 
+type NavItem = { label: string; hash: string };
+
 /**
- * Fixed site header. Transparent over the light top of the hero, condensing to
- * a solid cream bar once the page scrolls. On small screens the navigation
- * collapses into a full-screen overlay menu.
+ * Fixed header: transparent over the (dark) hero, solid cream once past it.
+ * Navigation collapses into a full-screen overlay on small screens.
  */
-export function SiteHeader() {
+export function SiteHeader({
+  locale,
+  nav,
+  cta,
+  a11y,
+  email,
+}: {
+  locale: Locale;
+  nav: NavItem[];
+  cta: string;
+  a11y: Dictionary["a11y"];
+  email: string;
+}) {
   const [solid, setSolid] = useState(false);
   const [open, setOpen] = useState(false);
 
-  // Stay transparent over the (dark) hero; turn solid once it's scrolled past.
   useEffect(() => {
     const onScroll = () => {
       const hero = document.getElementById("top");
@@ -33,7 +48,6 @@ export function SiteHeader() {
     };
   }, []);
 
-  // Lock background scroll and wire up Escape-to-close while the menu is open.
   useEffect(() => {
     if (!open) return;
     const root = document.documentElement;
@@ -60,21 +74,20 @@ export function SiteHeader() {
     >
       <Container className="flex h-16 items-center justify-between gap-6 sm:h-[4.5rem]">
         <Link
-          href="/"
-          aria-label={`${siteConfig.name} — home`}
+          href={`/${locale}`}
+          aria-label={`${siteConfig.name} — ${a11y.home}`}
           className="relative z-50 inline-flex items-center"
           onClick={() => setOpen(false)}
         >
           <Logo />
         </Link>
 
-        {/* Desktop navigation */}
         <nav aria-label="Primary" className="hidden lg:block">
           <ul className="flex items-center gap-9 text-sm font-medium">
-            {navItems.map((item) => (
-              <li key={item.href}>
+            {nav.map((item) => (
+              <li key={item.hash}>
                 <Link
-                  href={item.href}
+                  href={`#${item.hash}`}
                   className={cn(
                     "relative py-1 transition-colors duration-200 after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-0 after:bg-current after:transition-all after:duration-300 hover:after:w-full",
                     onLight ? "text-ink/70 hover:text-ink" : "text-cream/80 hover:text-cream",
@@ -87,9 +100,14 @@ export function SiteHeader() {
           </ul>
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
+          <LanguageSwitcher
+            locale={locale}
+            label={a11y.switchLanguage}
+            className="hidden sm:flex"
+          />
           <Link
-            href="/#contact"
+            href="#contact"
             className={cn(
               "hidden items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors duration-200 lg:inline-flex",
               onLight
@@ -97,17 +115,16 @@ export function SiteHeader() {
                 : "border border-cream/50 text-cream hover:bg-cream hover:text-ink",
             )}
           >
-            Start a project
+            {cta}
             <IconArrowRight className="text-base" />
           </Link>
 
-          {/* Mobile menu toggle */}
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
             aria-controls="mobile-menu"
-            aria-label={open ? "Close menu" : "Open menu"}
+            aria-label={open ? a11y.closeMenu : a11y.openMenu}
             className="relative z-50 inline-flex h-11 w-11 items-center justify-center rounded-full border border-current/25 text-2xl lg:hidden"
           >
             {open ? <IconClose /> : <IconMenu />}
@@ -115,7 +132,6 @@ export function SiteHeader() {
         </div>
       </Container>
 
-      {/* Full-screen mobile menu */}
       <div
         id="mobile-menu"
         className={cn(
@@ -126,10 +142,10 @@ export function SiteHeader() {
         <Container className="mt-24 flex flex-1 flex-col">
           <nav aria-label="Mobile">
             <ul className="flex flex-col">
-              {navItems.map((item, i) => (
-                <li key={item.href} className="border-b border-cream/10">
+              {nav.map((item, i) => (
+                <li key={item.hash} className="border-b border-cream/10">
                   <Link
-                    href={item.href}
+                    href={`#${item.hash}`}
                     onClick={() => setOpen(false)}
                     className="flex items-baseline gap-4 py-5 font-display text-3xl font-light tracking-tight transition-colors hover:text-clay"
                   >
@@ -144,11 +160,12 @@ export function SiteHeader() {
           </nav>
 
           <div className="mt-auto flex flex-col gap-6 py-10">
+            <LanguageSwitcher locale={locale} label={a11y.switchLanguage} className="text-base" />
             <a
-              href={`mailto:${siteConfig.contact.email}`}
+              href={`mailto:${email}`}
               className="text-lg text-cream/80 transition-colors hover:text-cream"
             >
-              {siteConfig.contact.email}
+              {email}
             </a>
             <SocialLinks className="text-cream/70" iconClassName="text-xl" />
           </div>

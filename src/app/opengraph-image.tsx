@@ -58,7 +58,7 @@ export default function OpengraphImage() {
               color: "rgba(244,240,232,0.7)",
             }}
           >
-            Based in Australia
+            Premium property agency
           </div>
         </div>
 
@@ -91,7 +91,7 @@ export default function OpengraphImage() {
             color: "rgba(244,240,232,0.8)",
           }}
         >
-          Architectural homes designed &amp; built across Australia — since {siteConfig.foundingYear}.
+          We source, style &amp; showcase exceptional homes — since {siteConfig.foundingYear}.
         </div>
       </div>
     ),

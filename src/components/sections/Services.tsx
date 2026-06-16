@@ -2,33 +2,12 @@ import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { AssembleHeading } from "@/components/ui/AssembleHeading";
 import { IconArrowRight } from "@/components/ui/icons";
-
-const services = [
-  {
-    no: "01",
-    title: "Custom Homes",
-    description:
-      "Ground-up homes designed around your site, your light and the way you live — engineered for comfort and built to last.",
-  },
-  {
-    no: "02",
-    title: "Knockdown & Rebuild",
-    description:
-      "Stay in the suburb you love. We replace tired structures with architectural homes that make the most of every square metre.",
-  },
-  {
-    no: "03",
-    title: "Architecture & Interiors",
-    description:
-      "A single team for exterior and interior — joinery, finishes and furniture resolved together for a seamless result.",
-  },
-];
+import type { Dictionary } from "@/i18n/dictionaries/en";
 
 /**
- * Services overview. Each offering reads as an editorial card with a number,
- * heading and short description — strong for both scannability and SEO.
+ * Services overview — how the agency helps, as editorial cards.
  */
-export function Services() {
+export function Services({ t }: { t: Dictionary["services"] }) {
   return (
     <section id="services" aria-labelledby="services-heading" className="bg-bone py-24 sm:py-32">
       <Container>
@@ -39,12 +18,12 @@ export function Services() {
               className="flex items-center gap-4 text-xs font-semibold uppercase tracking-[0.28em] text-clay"
             >
               <span aria-hidden className="h-px w-10 bg-clay" />
-              What we build
+              {t.eyebrow}
             </p>
             <AssembleHeading
               variant="flip"
               id="services-heading"
-              text="Three ways to bring your home to life."
+              text={t.heading}
               className="mt-6 max-w-2xl text-balance font-display text-4xl font-light leading-tight tracking-tight text-ink sm:text-5xl"
             />
           </div>
@@ -53,8 +32,8 @@ export function Services() {
         <ul
           data-reveal
           className="mt-16 grid gap-px overflow-hidden rounded-2xl border border-ink/10 bg-ink/10 sm:grid-cols-2 lg:grid-cols-3"
->
-          {services.map((service) => (
+        >
+          {t.items.map((service) => (
             <li
               key={service.no}
               className="group flex flex-col bg-bone p-8 transition-colors duration-300 hover:bg-cream sm:p-10"
@@ -69,11 +48,11 @@ export function Services() {
                 {service.description}
               </p>
               <Link
-                href="/#contact"
+                href="#contact"
                 className="mt-8 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-ink transition-colors hover:text-clay"
-                aria-label={`Enquire about ${service.title}`}
+                aria-label={`${t.cta} — ${service.title}`}
               >
-                Enquire
+                {t.cta}
                 <IconArrowRight className="text-base transition-transform duration-300 group-hover:translate-x-1" />
               </Link>
             </li>

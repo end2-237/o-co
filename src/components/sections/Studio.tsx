@@ -1,21 +1,13 @@
 import { Container } from "@/components/ui/Container";
 import { AssembleHeading } from "@/components/ui/AssembleHeading";
-import { siteConfig } from "@/lib/site";
-
-const stats = [
-  { value: `Since ${siteConfig.foundingYear}`, label: "Designing & building" },
-  { value: "140+", label: "Homes delivered" },
-  { value: "28", label: "Design awards" },
-  { value: "100%", label: "Bespoke to site" },
-];
+import type { Dictionary } from "@/i18n/dictionaries/en";
 
 /**
- * Studio / about band. Establishes credibility (E-E-A-T) with a short
- * narrative and a set of headline statistics.
+ * Agency / about band. Short narrative + headline statistics for credibility.
  */
-export function Studio() {
+export function Studio({ t }: { t: Dictionary["agency"] }) {
   return (
-    <section id="studio" aria-labelledby="studio-heading" className="bg-cream py-24 sm:py-32">
+    <section id="agency" aria-labelledby="agency-heading" className="bg-cream py-24 sm:py-32">
       <Container className="grid gap-16 lg:grid-cols-2 lg:gap-24">
         <div>
           <p
@@ -23,27 +15,23 @@ export function Studio() {
             className="flex items-center gap-4 text-xs font-semibold uppercase tracking-[0.28em] text-clay"
           >
             <span aria-hidden className="h-px w-10 bg-clay" />
-            The studio
+            {t.eyebrow}
           </p>
           <AssembleHeading
             variant="words"
-            id="studio-heading"
-            text="We design and build the home you'll actually live in."
+            id="agency-heading"
+            text={t.heading}
             className="mt-6 max-w-xl text-balance font-display text-4xl font-light leading-tight tracking-tight text-ink sm:text-5xl"
           />
         </div>
 
         <div className="flex flex-col gap-10">
           <p data-reveal className="text-pretty text-lg leading-relaxed text-ink/70">
-            O&amp;CO Homes is an architect-led builder working across {siteConfig.country}.
-            We bring design and construction under one roof, so the considered
-            details survive the journey from sketch to handover. Every project
-            starts with how you live — light, flow, materials and the small
-            moments that make a house feel like yours.
+            {t.body}
           </p>
 
           <dl className="grid grid-cols-2 gap-x-8 gap-y-10 border-t border-ink/10 pt-10">
-            {stats.map((stat, i) => (
+            {t.stats.map((stat, i) => (
               <div key={stat.label} data-reveal data-reveal-delay={i * 90}>
                 <dt className="sr-only">{stat.label}</dt>
                 <dd>

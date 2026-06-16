@@ -33,7 +33,7 @@ export function SocialLinks({
               href={item.href}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={`O&CO Homes on ${item.label}`}
+              aria-label={`O&CO on ${item.label}`}
               className={cn(
                 "inline-flex transition-colors duration-200 hover:text-clay",
                 linkClassName,

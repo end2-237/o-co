@@ -1,34 +1,32 @@
 import { siteConfig } from "@/lib/site";
+import { localeMeta, type Locale } from "@/i18n/config";
+import type { Dictionary } from "@/i18n/dictionaries/en";
 
 /**
- * Builds the JSON-LD graph injected into the document head.
- *
- * We expose the business as a `GeneralContractor` / `HomeAndConstructionBusiness`
- * (a LocalBusiness subtype well understood by Google) alongside the `WebSite`
- * and `WebPage` nodes. Using a single `@graph` with stable `@id`s lets the
- * nodes reference one another, which search engines reward.
+ * JSON-LD graph for the page. O&CO is exposed as a `RealEstateAgent`
+ * (a LocalBusiness subtype) alongside the `WebSite` and localized `WebPage`.
  */
-export function buildJsonLd() {
-  const { url } = siteConfig;
+export function buildJsonLd(locale: Locale, dict: Dictionary) {
+  const base = siteConfig.url;
+  const pageUrl = `${base}/${locale}`;
 
   const organization = {
-    "@type": ["GeneralContractor", "HomeAndConstructionBusiness"],
-    "@id": `${url}/#organization`,
+    "@type": "RealEstateAgent",
+    "@id": `${base}/#organization`,
     name: siteConfig.name,
     legalName: siteConfig.legalName,
-    url,
+    url: base,
     logo: {
       "@type": "ImageObject",
-      "@id": `${url}/#logo`,
-      url: `${url}/icon`,
+      "@id": `${base}/#logo`,
+      url: `${base}/icon`,
     },
-    image: `${url}/opengraph-image`,
-    description: siteConfig.description,
+    image: `${base}/opengraph-image`,
+    description: dict.meta.description,
     foundingDate: String(siteConfig.foundingYear),
-    slogan: siteConfig.tagline,
     email: siteConfig.contact.email,
     telephone: siteConfig.contact.phone,
-    priceRange: "$$$",
+    priceRange: "€€€",
     address: {
       "@type": "PostalAddress",
       streetAddress: siteConfig.address.street,
@@ -37,40 +35,37 @@ export function buildJsonLd() {
       postalCode: siteConfig.address.postalCode,
       addressCountry: siteConfig.address.country,
     },
-    areaServed: {
-      "@type": "Country",
-      name: siteConfig.country,
-    },
+    areaServed: { "@type": "City", name: siteConfig.address.locality },
     knowsAbout: [
-      "Custom home building",
-      "Residential architecture",
-      "Knockdown rebuild",
-      "Interior design",
-      "Sustainable construction",
+      "Premium real estate",
+      "Property sourcing",
+      "Home staging",
+      "Sales and lettings",
+      "Luxury apartments and villas",
     ],
     sameAs: Object.values(siteConfig.social),
   };
 
   const website = {
     "@type": "WebSite",
-    "@id": `${url}/#website`,
-    url,
+    "@id": `${base}/#website`,
+    url: base,
     name: siteConfig.name,
-    description: siteConfig.description,
-    inLanguage: siteConfig.localeBcp47,
-    publisher: { "@id": `${url}/#organization` },
+    description: dict.meta.description,
+    inLanguage: localeMeta[locale].htmlLang,
+    publisher: { "@id": `${base}/#organization` },
   };
 
   const webpage = {
     "@type": "WebPage",
-    "@id": `${url}/#webpage`,
-    url,
-    name: `${siteConfig.name} — Architectural Home Builders in Australia`,
-    description: siteConfig.description,
-    inLanguage: siteConfig.localeBcp47,
-    isPartOf: { "@id": `${url}/#website` },
-    about: { "@id": `${url}/#organization` },
-    primaryImageOfPage: `${url}/opengraph-image`,
+    "@id": `${pageUrl}/#webpage`,
+    url: pageUrl,
+    name: dict.meta.title,
+    description: dict.meta.description,
+    inLanguage: localeMeta[locale].htmlLang,
+    isPartOf: { "@id": `${base}/#website` },
+    about: { "@id": `${base}/#organization` },
+    primaryImageOfPage: `${base}/opengraph-image`,
   };
 
   return {

@@ -7,13 +7,13 @@ import immersiveImg from "@/assets/images/immersive-home.jpg";
 import { Container } from "@/components/ui/Container";
 import { AssembleHeading } from "@/components/ui/AssembleHeading";
 import { IconArrowRight } from "@/components/ui/icons";
+import type { Dictionary } from "@/i18n/dictionaries/en";
 
 /**
- * Immersive, emotional band directly after the hero. A full-height photograph
- * of a home glowing at dusk drifts behind the copy with a light parallax, while
- * the headline speaks to the feeling of coming home rather than the spec sheet.
+ * Immersive, emotional band after the hero, with a light parallax photograph
+ * and a headline that recomposes into place.
  */
-export function Immersive() {
+export function Immersive({ t }: { t: Dictionary["immersive"] }) {
   const sectionRef = useRef<HTMLElement>(null);
   const imageRef = useRef<HTMLDivElement>(null);
 
@@ -32,7 +32,6 @@ export function Immersive() {
       raf = 0;
       const rect = section.getBoundingClientRect();
       const vh = window.innerHeight;
-      // -1 (entering from below) → 1 (leaving above), centered at 0.
       const rel = (rect.top + rect.height / 2 - vh / 2) / vh;
       const y = Math.max(-8, Math.min(8, rel * 14));
       image.style.transform = `translate3d(0, ${y}%, 0) scale(1.2)`;
@@ -64,7 +63,7 @@ export function Immersive() {
       >
         <Image
           src={immersiveImg}
-          alt="A warmly lit architectural home glowing at dusk beneath a gum tree"
+          alt=""
           fill
           sizes="100vw"
           placeholder="blur"
@@ -83,11 +82,11 @@ export function Immersive() {
             className="flex items-center gap-4 text-xs font-semibold uppercase tracking-[0.3em] text-cream/85"
           >
             <span aria-hidden className="h-px w-10 bg-clay" />
-            Find your new home
+            {t.eyebrow}
           </p>
           <AssembleHeading
             id="immersive-heading"
-            text="Home is the one place that should feel like you."
+            text={t.headline}
             className="mt-6 text-balance font-display text-[clamp(2.25rem,6vw,5rem)] font-light leading-[1.03] tracking-tight"
           />
           <p
@@ -95,9 +94,7 @@ export function Immersive() {
             data-reveal-delay={120}
             className="mt-7 max-w-xl text-pretty text-lg leading-relaxed text-cream/80"
           >
-            From the first light in the kitchen to the hush of the last room at
-            night, we design for the moments you&apos;ll actually live — the
-            quiet, ordinary, irreplaceable ones.
+            {t.body}
           </p>
           <div
             data-reveal
@@ -105,17 +102,17 @@ export function Immersive() {
             className="mt-10 flex flex-wrap items-center gap-5"
           >
             <Link
-              href="/#homes"
+              href="#properties"
               className="group inline-flex items-center gap-3 bg-cream px-7 py-4 text-sm font-semibold uppercase tracking-[0.18em] text-ink transition-colors duration-300 hover:bg-sand"
             >
-              Explore our homes
+              {t.ctaPrimary}
               <IconArrowRight className="text-base transition-transform duration-300 group-hover:translate-x-1" />
             </Link>
             <Link
-              href="/#contact"
+              href="#contact"
               className="text-sm font-semibold uppercase tracking-[0.18em] text-cream/85 underline-offset-8 transition-colors hover:text-cream hover:underline"
             >
-              Start your project
+              {t.ctaSecondary}
             </Link>
           </div>
         </div>

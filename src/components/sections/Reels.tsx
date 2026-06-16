@@ -12,46 +12,14 @@ import {
   IconPlay,
   IconShare,
 } from "@/components/ui/icons";
+import { siteConfig } from "@/lib/site";
+import type { Dictionary } from "@/i18n/dictionaries/en";
 
-const TIKTOK_URL = "https://www.tiktok.com/@ocohomes";
-
-const reels: Reel[] = [
-  {
-    src: "/videos/reels/r3.mp4",
-    handle: "ocohomes",
-    caption: "Before → after: the Mosman rebuild 🤍",
-    likes: "23.7k",
-    comments: "412",
-    shares: "1.2k",
-    music: "O&CO · original sound",
-  },
-  {
-    src: "/videos/reels/r1.mp4",
-    handle: "ocohomes",
-    caption: "Kitchen reveal ✨ spotted gum + honed stone",
-    likes: "12.4k",
-    comments: "208",
-    shares: "540",
-    music: "calm interiors · original",
-  },
-  {
-    src: "/videos/reels/r2.mp4",
-    handle: "ocohomes",
-    caption: "Walk-through: the North Light living room",
-    likes: "8,116",
-    comments: "96",
-    shares: "302",
-    music: "O&CO · original sound",
-  },
-  {
-    src: "/videos/reels/r5.mp4",
-    handle: "ocohomes",
-    caption: "Handover day at Saltwater House 🌴",
-    likes: "15.2k",
-    comments: "330",
-    shares: "688",
-    music: "golden hour · original",
-  },
+const MEDIA = [
+  { src: "/videos/reels/r3.mp4", likes: "23.7k", comments: "412", shares: "1.2k" },
+  { src: "/videos/reels/r1.mp4", likes: "12.4k", comments: "208", shares: "540" },
+  { src: "/videos/reels/r2.mp4", likes: "8,116", comments: "96", shares: "302" },
+  { src: "/videos/reels/r5.mp4", likes: "15.2k", comments: "330", shares: "688" },
 ];
 
 function MiniStat({ icon, value }: { icon: React.ReactNode; value: string }) {
@@ -64,16 +32,21 @@ function MiniStat({ icon, value }: { icon: React.ReactNode; value: string }) {
 }
 
 /**
- * TikTok-style social section. A horizontal "discovery" row of vertical 9:16
- * cards that autoplay (muted) as they scroll into view; tapping one opens an
- * immersive fullscreen reel player.
+ * TikTok-style social section: a horizontal row of vertical 9:16 cards that
+ * autoplay in view, opening an immersive fullscreen reel player on tap.
  */
-export function Reels() {
+export function Reels({ t }: { t: Dictionary["reels"] }) {
+  const reels: Reel[] = MEDIA.map((m, i) => ({
+    ...m,
+    handle: "ocohomes",
+    caption: t.captions[i],
+    music: t.music[i],
+  }));
+
   const [open, setOpen] = useState<number | null>(null);
   const rowRef = useRef<HTMLUListElement>(null);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
-  // Autoplay each card while it's the one in view; pause the rest.
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const io = new IntersectionObserver(
@@ -111,31 +84,27 @@ export function Reels() {
               className="flex items-center gap-4 text-xs font-semibold uppercase tracking-[0.28em] text-clay"
             >
               <span aria-hidden className="h-px w-10 bg-clay" />
-              @ocohomes
+              {t.eyebrow}
             </p>
             <AssembleHeading
               variant="scramble"
               id="social-heading"
-              text="Inside our builds, in sixty seconds."
+              text={t.heading}
               className="mt-6 max-w-2xl text-balance font-display text-4xl font-light leading-tight tracking-tight sm:text-5xl"
             />
-            <p
-              data-reveal
-              className="mt-5 max-w-md text-pretty leading-relaxed text-cream/70"
-            >
-              Site walk-throughs, reveals and the moments in between. Tap a clip
-              to watch full screen.
+            <p data-reveal className="mt-5 max-w-md text-pretty leading-relaxed text-cream/70">
+              {t.body}
             </p>
           </div>
 
           <div data-reveal data-reveal-delay={120} className="flex items-center gap-3">
             <a
-              href={TIKTOK_URL}
+              href={siteConfig.social.tiktok}
               target="_blank"
               rel="noopener noreferrer"
               className="group inline-flex items-center gap-2 rounded-full border border-cream/40 px-5 py-2.5 text-sm font-semibold transition-colors hover:bg-cream hover:text-ink"
             >
-              Follow on TikTok
+              {t.follow}
               <IconArrowRight className="text-base transition-transform duration-300 group-hover:translate-x-1" />
             </a>
             <div className="hidden gap-2 lg:flex">
@@ -169,7 +138,7 @@ export function Reels() {
               <button
                 type="button"
                 onClick={() => setOpen(i)}
-                aria-label={`Play reel: ${reel.caption}`}
+                aria-label={reel.caption}
                 className="group relative block aspect-[9/16] w-[260px] overflow-hidden rounded-2xl bg-black sm:w-[300px]"
               >
                 <video
@@ -187,8 +156,6 @@ export function Reels() {
                   aria-hidden
                   className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/20"
                 />
-
-                {/* Hover play affordance */}
                 <span
                   aria-hidden
                   className="pointer-events-none absolute inset-0 grid place-items-center opacity-0 transition-opacity duration-300 group-hover:opacity-100"
@@ -197,16 +164,12 @@ export function Reels() {
                     <IconPlay />
                   </span>
                 </span>
-
-                {/* Caption + stats */}
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 p-3 text-left">
                   <div className="min-w-0">
                     <p className="text-sm font-semibold">@{reel.handle}</p>
-                    <p className="mt-1 line-clamp-2 text-xs text-cream/85">
-                      {reel.caption}
-                    </p>
+                    <p className="mt-1 line-clamp-2 text-xs text-cream/85">{reel.caption}</p>
                     <p className="mt-1.5 flex items-center gap-1 text-[0.65rem] text-cream/70">
-                      <IconMusic className="text-xs shrink-0" />
+                      <IconMusic className="shrink-0 text-xs" />
                       <span className="truncate">{reel.music}</span>
                     </p>
                   </div>
