@@ -125,7 +125,7 @@ export default async function LocaleLayout({
         <main id="main" className="flex-1">
           {children}
         </main>
-        <SiteFooter locale={locale} t={dict.footer} nav={dict.nav} />
+        <SiteFooter locale={locale} t={dict.footer} nav={dict.nav} areas={dict.areas.list} />
 
         <script
           type="application/ld+json"

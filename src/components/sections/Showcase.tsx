@@ -5,17 +5,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { IconArrowRight } from "@/components/ui/icons";
-import { Lightbox, type LightboxItem } from "@/components/sections/Lightbox";
 import { AssembleHeading } from "@/components/ui/AssembleHeading";
+import { propertyImages } from "@/lib/property-images";
 import { cn } from "@/lib/utils";
+import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
-import coastal from "@/assets/images/home-coastal.jpg";
-import living from "@/assets/images/home-living.jpg";
-import modern from "@/assets/images/home-modern.jpg";
-import interior from "@/assets/images/home-interior.jpg";
-import pool from "@/assets/images/home-pool.jpg";
-
-const images = [coastal, living, modern, interior, pool];
 
 const SHUFFLE_MS = 3200;
 const SWAP_MS = 1100;
@@ -25,13 +19,11 @@ type Pos = { top: number; left: number };
 
 /**
  * Featured-properties gallery. The four equal cards interchange positions on a
- * timer (FLIP) and clicking a card opens a fullscreen lightbox with a drape
- * distortion reveal.
+ * timer (FLIP); each card links to its property page.
  */
-export function Showcase({ t }: { t: Dictionary["properties"] }) {
+export function Showcase({ t, locale }: { t: Dictionary["properties"]; locale: Locale }) {
   const items = t.items;
   const [order, setOrder] = useState<number[]>(() => items.map((_, i) => i));
-  const [active, setActive] = useState<{ item: LightboxItem; rect: DOMRect } | null>(null);
   const [paused, setPaused] = useState(false);
   const [enabled, setEnabled] = useState(false);
 
@@ -106,7 +98,7 @@ export function Showcase({ t }: { t: Dictionary["properties"] }) {
   }, []);
 
   useEffect(() => {
-    if (!enabled || paused || active) return;
+    if (!enabled || paused) return;
     const id = window.setInterval(() => {
       setOrder((prev) => {
         const span = prev.length - 1;
@@ -120,7 +112,7 @@ export function Showcase({ t }: { t: Dictionary["properties"] }) {
       });
     }, SHUFFLE_MS);
     return () => window.clearInterval(id);
-  }, [enabled, paused, active]);
+  }, [enabled, paused]);
 
   return (
     <section id="properties" aria-labelledby="properties-heading" className="bg-cream py-24 sm:py-32">
@@ -158,20 +150,27 @@ export function Showcase({ t }: { t: Dictionary["properties"] }) {
         >
           {order.map((index, pos) => {
             const item = items[index];
-            const image = images[index];
+            const image = propertyImages[item.slug];
             const statusLabel = item.status === "rent" ? t.forRent : t.forSale;
             return (
               <li
-                key={item.name}
+                key={item.slug}
                 ref={(el) => {
-                  if (el) itemEls.current.set(item.name, el);
-                  else itemEls.current.delete(item.name);
+                  if (el) itemEls.current.set(item.slug, el);
+                  else itemEls.current.delete(item.slug);
                 }}
                 className={cn(
                   "group relative min-h-[18rem] overflow-hidden rounded-2xl",
                   pos === 0 && "lg:row-span-2",
                 )}
               >
+                <Link
+                  href={`/${locale}/properties/${item.slug}`}
+                  aria-label={`${item.name}, ${item.location} — ${item.price}`}
+                  className="absolute inset-0 z-10"
+                >
+                  <span className="sr-only">{t.viewLabel}</span>
+                </Link>
                 <Image
                   src={image}
                   alt={item.alt}
@@ -184,23 +183,6 @@ export function Showcase({ t }: { t: Dictionary["properties"] }) {
                   aria-hidden
                   className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/15 to-transparent"
                 />
-                <button
-                  type="button"
-                  aria-label={`${item.name}, ${item.location}`}
-                  onClick={(e) =>
-                    setActive({
-                      item: {
-                        src: image.src,
-                        alt: item.alt,
-                        name: item.name,
-                        location: `${item.location} · ${item.price}`,
-                        type: item.type,
-                      },
-                      rect: e.currentTarget.getBoundingClientRect(),
-                    })
-                  }
-                  className="absolute inset-0 z-10 cursor-pointer"
-                />
                 <div className="pointer-events-none absolute inset-0 flex flex-col justify-between p-5 text-cream sm:p-6">
                   <span className="inline-flex w-fit rounded-full bg-cream/15 px-3 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.16em] backdrop-blur-sm">
                     {statusLabel}
@@ -211,6 +193,9 @@ export function Showcase({ t }: { t: Dictionary["properties"] }) {
                     </p>
                     <h3 className="mt-1 font-display text-2xl font-medium">{item.name}</h3>
                     <p className="mt-1 text-lg font-semibold">{item.price}</p>
+                    <p className="mt-2 text-xs text-cream/75">
+                      {item.beds} {t.bedsLabel} · {item.baths} {t.bathsLabel} · {item.surface}
+                    </p>
                   </div>
                 </div>
               </li>
@@ -218,10 +203,6 @@ export function Showcase({ t }: { t: Dictionary["properties"] }) {
           })}
         </ul>
       </Container>
-
-      {active && (
-        <Lightbox item={active.item} rect={active.rect} onClose={() => setActive(null)} />
-      )}
     </section>
   );
 }
