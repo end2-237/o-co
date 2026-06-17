@@ -3,12 +3,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/Container";
 import { PropertyGallery } from "@/components/sections/PropertyGallery";
-import { IconArrowRight } from "@/components/ui/icons";
+import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { isLocale, localeMeta } from "@/i18n/config";
 import { en } from "@/i18n/dictionaries/en";
 import { getProperty } from "@/lib/properties";
-import { siteConfig } from "@/lib/site";
+import { siteConfig, waLink } from "@/lib/site";
 
 type Params = Promise<{ locale: string; slug: string }>;
 
@@ -52,6 +52,7 @@ export default async function PropertyPage({ params }: { params: Params }) {
   if (!property) notFound();
 
   const d = dict.propertyDetail;
+  const onRequest = dict.properties.priceOnRequest;
   const statusLabel =
     property.status === "rent" ? dict.properties.forRent : dict.properties.forSale;
   const schemaType = /villa|house|maison/i.test(property.type) ? "House" : "Apartment";
@@ -64,7 +65,7 @@ export default async function PropertyPage({ params }: { params: Params }) {
     .toUpperCase();
 
   const facts = [
-    { label: d.labels.price, value: property.price },
+    { label: d.labels.price, value: onRequest },
     { label: d.labels.type, value: property.type },
     { label: d.labels.beds, value: String(property.beds) },
     { label: d.labels.baths, value: String(property.baths) },
@@ -75,26 +76,20 @@ export default async function PropertyPage({ params }: { params: Params }) {
 
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Offer",
+    "@type": schemaType,
+    name: property.name,
+    description: property.description,
     url: `${siteConfig.url}/${locale}/properties/${slug}`,
-    priceCurrency: "EUR",
-    price: property.priceValue,
-    availability: "https://schema.org/InStock",
     image: `${siteConfig.url}${property.image.src}`,
-    itemOffered: {
-      "@type": ["Accommodation", schemaType],
-      name: property.name,
-      description: property.description,
-      numberOfBedrooms: property.beds,
-      numberOfBathroomsTotal: property.baths,
-      ...(surfaceValue
-        ? { floorSize: { "@type": "QuantitativeValue", value: surfaceValue, unitCode: "MTK" } }
-        : {}),
-      address: {
-        "@type": "PostalAddress",
-        addressLocality: property.location,
-        addressCountry: siteConfig.address.country,
-      },
+    numberOfBedrooms: property.beds,
+    numberOfBathroomsTotal: property.baths,
+    ...(surfaceValue
+      ? { floorSize: { "@type": "QuantitativeValue", value: surfaceValue, unitCode: "MTK" } }
+      : {}),
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: property.location,
+      addressCountry: siteConfig.address.country,
     },
   };
 
@@ -102,7 +97,7 @@ export default async function PropertyPage({ params }: { params: Params }) {
     <article className="bg-cream pb-24 pt-28 sm:pt-32">
       <Container>
         <Link
-          href={`/${locale}#properties`}
+          href={`/${locale}/properties`}
           className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-ink/70 transition-colors hover:text-ink"
         >
           ← {d.back}
@@ -113,7 +108,7 @@ export default async function PropertyPage({ params }: { params: Params }) {
             image={property.image}
             alt={property.alt}
             name={property.name}
-            location={`${property.location} · ${property.price}`}
+            location={property.location}
             type={property.type}
             hint={d.galleryHint}
           />
@@ -130,7 +125,7 @@ export default async function PropertyPage({ params }: { params: Params }) {
             <p className="mt-3 text-sm uppercase tracking-[0.18em] text-ink/55">
               {property.type} · {property.location}
             </p>
-            <p className="mt-4 font-display text-3xl font-semibold text-ink">{property.price}</p>
+            <p className="mt-4 font-display text-2xl font-medium text-ink">{onRequest}</p>
             <p className="mt-3 text-ink/65">
               {property.beds} {dict.properties.bedsLabel} · {property.baths}{" "}
               {dict.properties.bathsLabel} · {property.surface}
@@ -175,29 +170,15 @@ export default async function PropertyPage({ params }: { params: Params }) {
                   <p className="text-sm text-ink/55">{property.agentRole}</p>
                 </div>
               </div>
-              <div className="mt-5 space-y-1 text-sm text-ink/70">
-                <a
-                  href={`mailto:${siteConfig.contact.email}`}
-                  className="block transition-colors hover:text-clay"
-                >
-                  {siteConfig.contact.email}
-                </a>
-                <a
-                  href={`tel:${siteConfig.contact.phoneHref}`}
-                  className="block transition-colors hover:text-clay"
-                >
-                  {siteConfig.contact.phone}
-                </a>
+              <div className="mt-6">
+                <WhatsAppButton
+                  href={waLink(
+                    `${dict.whatsapp.viewingMessage} ${property.name} (${property.location}).`,
+                  )}
+                  label={dict.whatsapp.viewing}
+                />
               </div>
             </div>
-
-            <Link
-              href={`/${locale}#contact`}
-              className="group mt-4 inline-flex w-full items-center justify-center gap-3 rounded-full bg-ink px-7 py-4 text-sm font-semibold uppercase tracking-[0.16em] text-cream transition-colors hover:bg-ink-soft"
-            >
-              {d.viewingCta}
-              <IconArrowRight className="text-base transition-transform duration-300 group-hover:translate-x-1" />
-            </Link>
           </aside>
         </div>
       </Container>

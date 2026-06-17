@@ -1,27 +1,28 @@
 /**
- * Locale-agnostic configuration for O&CO (a premium property agency).
- * All display copy lives in the i18n dictionaries; this holds brand, contact,
- * social and address data only.
+ * Locale-agnostic configuration for O&CO (a premium property agency, Cameroon).
+ * Display copy lives in the i18n dictionaries.
  */
 export const siteConfig = {
   name: "O&CO",
-  legalName: "O&CO Property",
+  legalName: "O&CO Immobilier",
   /** Canonical production URL — update to the real domain before launch. */
-  url: "https://www.ocohomes.com.au",
+  url: "https://www.oco-immo.cm",
   foundingYear: 2012,
 
   contact: {
-    email: "hello@ocohomes.com",
-    phone: "+33 1 84 80 00 00",
-    phoneHref: "+33184800000",
+    email: "hello@oco-immo.cm",
+    phone: "+237 6 90 00 00 00",
+    phoneHref: "237690000000",
   },
 
+  /** WhatsApp number in international format, digits only (for wa.me links). */
+  whatsapp: "237690000000",
+
   address: {
-    street: "12 Rue de la Paix",
-    locality: "Paris",
-    region: "Île-de-France",
-    postalCode: "75002",
-    country: "FR",
+    street: "Rue Joss, Bonanjo",
+    locality: "Douala",
+    region: "Littoral",
+    country: "CM",
   },
 
   social: {
@@ -42,3 +43,8 @@ export const socialItems: { label: string; href: string; key: SocialKey }[] = [
   { label: "Facebook", href: siteConfig.social.facebook, key: "facebook" },
   { label: "LinkedIn", href: siteConfig.social.linkedin, key: "linkedin" },
 ];
+
+/** Build a WhatsApp click-to-chat link with a prefilled message. */
+export function waLink(text: string): string {
+  return `https://wa.me/${siteConfig.whatsapp}?text=${encodeURIComponent(text)}`;
+}

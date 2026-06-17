@@ -1,13 +1,22 @@
 import { Container } from "@/components/ui/Container";
 import { AssembleHeading } from "@/components/ui/AssembleHeading";
 import { ContactForm } from "@/components/sections/ContactForm";
-import { siteConfig } from "@/lib/site";
+import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
+import { siteConfig, waLink } from "@/lib/site";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 
 /**
- * Closing contact band — heading, contact details and the qualified lead form.
+ * Closing contact band — heading, WhatsApp + contact details, and the lead form.
  */
-export function CTA({ t, form }: { t: Dictionary["cta"]; form: Dictionary["form"] }) {
+export function CTA({
+  t,
+  form,
+  whatsapp,
+}: {
+  t: Dictionary["cta"];
+  form: Dictionary["form"];
+  whatsapp: Dictionary["whatsapp"];
+}) {
   return (
     <section
       id="contact"
@@ -32,7 +41,11 @@ export function CTA({ t, form }: { t: Dictionary["cta"]; form: Dictionary["form"
             {t.body}
           </p>
 
-          <dl className="mt-10 grid gap-6 sm:grid-cols-2">
+          <div data-reveal className="mt-8">
+            <WhatsAppButton href={waLink(whatsapp.contactMessage)} label={whatsapp.contact} />
+          </div>
+
+          <dl data-reveal className="mt-10 grid gap-6 sm:grid-cols-2">
             <div>
               <dt className="text-xs uppercase tracking-[0.2em] text-cream/50">{t.emailLabel}</dt>
               <dd className="mt-2">
@@ -58,8 +71,7 @@ export function CTA({ t, form }: { t: Dictionary["cta"]; form: Dictionary["form"
             <div className="sm:col-span-2">
               <dt className="text-xs uppercase tracking-[0.2em] text-cream/50">{t.officeLabel}</dt>
               <dd className="mt-2 not-italic text-lg leading-relaxed text-cream/80">
-                {siteConfig.address.street}, {siteConfig.address.postalCode}{" "}
-                {siteConfig.address.locality}
+                {siteConfig.address.street}, {siteConfig.address.locality}
               </dd>
             </div>
           </dl>

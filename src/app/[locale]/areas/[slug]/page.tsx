@@ -117,7 +117,9 @@ export default async function AreaPage({ params }: { params: Params }) {
                       {property.type} · {property.location}
                     </p>
                     <h2 className="mt-1 font-display text-xl font-medium">{property.name}</h2>
-                    <p className="mt-1 font-semibold">{property.price}</p>
+                    <p className="mt-1 text-sm font-semibold text-cream/90">
+                      {dict.properties.priceOnRequest}
+                    </p>
                     <p className="mt-2 text-xs text-cream/75">
                       {property.beds} {dict.properties.bedsLabel} · {property.baths}{" "}
                       {dict.properties.bathsLabel} · {property.surface}

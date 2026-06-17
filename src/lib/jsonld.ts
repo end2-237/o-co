@@ -26,13 +26,11 @@ export function buildJsonLd(locale: Locale, dict: Dictionary) {
     foundingDate: String(siteConfig.foundingYear),
     email: siteConfig.contact.email,
     telephone: siteConfig.contact.phone,
-    priceRange: "€€€",
     address: {
       "@type": "PostalAddress",
       streetAddress: siteConfig.address.street,
       addressLocality: siteConfig.address.locality,
       addressRegion: siteConfig.address.region,
-      postalCode: siteConfig.address.postalCode,
       addressCountry: siteConfig.address.country,
     },
     areaServed: { "@type": "City", name: siteConfig.address.locality },

@@ -134,11 +134,11 @@ export function Showcase({ t, locale }: { t: Dictionary["properties"]; locale: L
             />
           </div>
           <Link
-            href="#contact"
+            href={`/${locale}/properties`}
             data-reveal
             className="group inline-flex items-center gap-2 self-start text-sm font-semibold uppercase tracking-[0.16em] text-ink transition-colors hover:text-clay md:self-auto"
           >
-            {t.cta}
+            {t.viewAll}
             <IconArrowRight className="text-base transition-transform duration-300 group-hover:translate-x-1" />
           </Link>
         </div>
@@ -166,7 +166,7 @@ export function Showcase({ t, locale }: { t: Dictionary["properties"]; locale: L
               >
                 <Link
                   href={`/${locale}/properties/${item.slug}`}
-                  aria-label={`${item.name}, ${item.location} — ${item.price}`}
+                  aria-label={`${item.name}, ${item.location}`}
                   className="absolute inset-0 z-10"
                 >
                   <span className="sr-only">{t.viewLabel}</span>
@@ -192,7 +192,7 @@ export function Showcase({ t, locale }: { t: Dictionary["properties"]; locale: L
                       {item.type} · {item.location}
                     </p>
                     <h3 className="mt-1 font-display text-2xl font-medium">{item.name}</h3>
-                    <p className="mt-1 text-lg font-semibold">{item.price}</p>
+                    <p className="mt-1 text-sm font-semibold text-cream/90">{t.priceOnRequest}</p>
                     <p className="mt-2 text-xs text-cream/75">
                       {item.beds} {t.bedsLabel} · {item.baths} {t.bathsLabel} · {item.surface}
                     </p>

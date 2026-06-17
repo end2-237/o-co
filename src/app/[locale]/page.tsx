@@ -46,7 +46,7 @@ export default async function HomePage({
       <Approach t={dict.process} />
       <Team t={dict.team} />
       <Areas t={dict.areas} locale={locale} counts={counts} />
-      <CTA t={dict.cta} form={dict.form} />
+      <CTA t={dict.cta} form={dict.form} whatsapp={dict.whatsapp} />
       <Reveals />
     </>
   );

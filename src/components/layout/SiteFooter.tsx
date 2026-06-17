@@ -6,7 +6,7 @@ import { siteConfig } from "@/lib/site";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 
-type NavItem = { label: string; hash: string };
+type NavItem = { label: string; hash?: string; to?: string };
 type AreaItem = { slug: string; name: string };
 
 export function SiteFooter({
@@ -37,9 +37,9 @@ export function SiteFooter({
           <h2 className="text-xs uppercase tracking-[0.2em] text-cream/45">{t.exploreLabel}</h2>
           <ul className="mt-5 space-y-3">
             {nav.map((item) => (
-              <li key={item.hash}>
+              <li key={item.label}>
                 <Link
-                  href={`#${item.hash}`}
+                  href={item.to ? `/${locale}/${item.to}` : `/${locale}#${item.hash}`}
                   className="text-cream/75 transition-colors hover:text-cream"
                 >
                   {item.label}
@@ -92,7 +92,7 @@ export function SiteFooter({
           <address className="mt-5 not-italic leading-relaxed text-cream/75">
             {siteConfig.address.street}
             <br />
-            {siteConfig.address.postalCode} {siteConfig.address.locality}
+            {siteConfig.address.locality}
             <br />
             {siteConfig.address.region}
           </address>

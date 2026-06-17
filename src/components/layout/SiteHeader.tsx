@@ -13,7 +13,7 @@ import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { cn } from "@/lib/utils";
 
-type NavItem = { label: string; hash: string };
+type NavItem = { label: string; hash?: string; to?: string };
 
 /**
  * Fixed header: transparent over the (dark) hero, solid cream once past it.
@@ -63,6 +63,8 @@ export function SiteHeader({
   }, [open]);
 
   const onLight = solid && !open;
+  const navHref = (item: NavItem) =>
+    item.to ? `/${locale}/${item.to}` : `/${locale}#${item.hash}`;
 
   return (
     <header
@@ -86,9 +88,9 @@ export function SiteHeader({
         <nav aria-label="Primary" className="hidden lg:block">
           <ul className="flex items-center gap-9 text-sm font-medium">
             {nav.map((item) => (
-              <li key={item.hash}>
+              <li key={item.label}>
                 <Link
-                  href={`#${item.hash}`}
+                  href={navHref(item)}
                   className={cn(
                     "relative py-1 transition-colors duration-200 after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-0 after:bg-current after:transition-all after:duration-300 hover:after:w-full",
                     onLight ? "text-ink/70 hover:text-ink" : "text-cream/80 hover:text-cream",
@@ -109,7 +111,7 @@ export function SiteHeader({
             className="hidden sm:flex"
           />
           <Link
-            href="#contact"
+            href={`/${locale}#contact`}
             className={cn(
               "hidden items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors duration-200 lg:inline-flex",
               onLight
@@ -145,9 +147,9 @@ export function SiteHeader({
           <nav aria-label="Mobile">
             <ul className="flex flex-col">
               {nav.map((item, i) => (
-                <li key={item.hash} className="border-b border-cream/10">
+                <li key={item.label} className="border-b border-cream/10">
                   <Link
-                    href={`#${item.hash}`}
+                    href={navHref(item)}
                     onClick={() => setOpen(false)}
                     className="flex items-baseline gap-4 py-5 font-display text-3xl font-light tracking-tight transition-colors hover:text-clay"
                   >
