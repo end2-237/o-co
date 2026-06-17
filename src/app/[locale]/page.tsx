@@ -14,6 +14,7 @@ import { Team } from "@/components/sections/Team";
 import { Areas } from "@/components/sections/Areas";
 import { CTA } from "@/components/sections/CTA";
 import { Reveals } from "@/components/ui/Reveals";
+import { Loader } from "@/components/audio/Loader";
 
 export default async function HomePage({
   params,
@@ -33,6 +34,7 @@ export default async function HomePage({
 
   return (
     <>
+      <Loader />
       <Hero t={dict.hero} />
       <Immersive t={dict.immersive} />
       <Showcase t={dict.properties} locale={locale} />

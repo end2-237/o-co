@@ -15,8 +15,8 @@ import type { Dictionary } from "@/i18n/dictionaries/en";
  * music starts at the same moment.
  */
 
-const INTRO_DELAY = 1000; // wait a beat after load
-const INTRO_DURATION = 2800;
+const INTRO_DELAY = 350; // brief beat once the loader releases
+const INTRO_DURATION = 2600;
 const OVERLAY_START = 0.25;
 const OVERLAY_END = 0.62;
 const VIDEO_FADE_START = 0.78;
@@ -29,7 +29,7 @@ const easeInOut = (t: number) =>
   t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
 export function Hero({ t }: { t: Dictionary["hero"] }) {
-  const { start: startMusic } = useMusic();
+  const { start: startMusic, started } = useMusic();
   const musicStart = useRef(startMusic);
   musicStart.current = startMusic;
 
@@ -98,6 +98,12 @@ export function Hero({ t }: { t: Dictionary["hero"] }) {
       return;
     }
 
+    // Hold the initial card until the loader releases the intro.
+    if (!started) {
+      apply(0);
+      return;
+    }
+
     let raf = 0;
     let startTime = 0;
     const tick = (now: number) => {
@@ -121,7 +127,7 @@ export function Hero({ t }: { t: Dictionary["hero"] }) {
       if (raf) cancelAnimationFrame(raf);
       window.clearTimeout(musicTimer);
     };
-  }, []);
+  }, [started]);
 
   return (
     <section

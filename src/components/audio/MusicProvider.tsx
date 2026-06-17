@@ -12,7 +12,11 @@ import {
 
 type MusicContextValue = {
   playing: boolean;
+  ready: boolean; // audio buffered enough to play without lag
+  started: boolean; // the intro has been released by the loader
   title: string;
+  prime: () => void; // begin preloading the audio
+  begin: () => void; // release the intro (loader is done)
   toggle: () => void;
   start: () => void;
   stop: () => void;
@@ -27,12 +31,10 @@ export function useMusic() {
 }
 
 /**
- * Owns the background-music <audio> element and exposes play/stop/toggle.
- *
- * Browsers block audio autoplay with sound, so `start()` tries to play and, if
- * the browser refuses, arms a one-time listener that starts the track on the
- * user's first interaction (pointer / key / touch) — including the first
- * scroll. The nav toggle can also start/stop it at any time.
+ * Owns the background-music <audio>. The loader calls `prime()` to preload the
+ * track, waits for `ready`, then `begin()`s the experience — so the intro and
+ * the music start together with no buffering lag. `start()` plays where the
+ * browser allows autoplay, otherwise on the first user gesture.
  */
 export function MusicProvider({
   src,
@@ -45,6 +47,9 @@ export function MusicProvider({
 }) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [started, setStarted] = useState(false);
+  const primedRef = useRef(false);
   const gestureHandler = useRef<(() => void) | null>(null);
 
   const removeGesture = useCallback(() => {
@@ -57,6 +62,25 @@ export function MusicProvider({
       gestureHandler.current = null;
     }
   }, []);
+
+  const prime = useCallback(() => {
+    if (primedRef.current) return;
+    primedRef.current = true;
+    const audio = audioRef.current;
+    if (!audio) {
+      setReady(true);
+      return;
+    }
+    audio.preload = "auto";
+    const onReady = () => setReady(true);
+    audio.addEventListener("canplaythrough", onReady, { once: true });
+    audio.addEventListener("loadeddata", onReady, { once: true });
+    audio.load();
+    // Safety net so the loader never hangs if the audio is slow or blocked.
+    window.setTimeout(() => setReady(true), 6000);
+  }, []);
+
+  const begin = useCallback(() => setStarted(true), []);
 
   const start = useCallback(() => {
     const audio = audioRef.current;
@@ -92,7 +116,6 @@ export function MusicProvider({
     else start();
   }, [playing, start, stop]);
 
-  // Keep state in sync if the audio is paused/played by other means.
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -109,8 +132,8 @@ export function MusicProvider({
   useEffect(() => removeGesture, [removeGesture]);
 
   const value = useMemo(
-    () => ({ playing, title, toggle, start, stop }),
-    [playing, title, toggle, start, stop],
+    () => ({ playing, ready, started, title, prime, begin, toggle, start, stop }),
+    [playing, ready, started, title, prime, begin, toggle, start, stop],
   );
 
   return (
