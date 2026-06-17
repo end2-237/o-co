@@ -9,7 +9,7 @@ export function Logo({ className }: { className?: string }) {
   return (
     <span
       className={cn(
-        "font-display text-2xl font-extrabold leading-none tracking-[-0.02em]",
+        "font-display text-2xl font-semibold leading-none tracking-[0.01em]",
         className,
       )}
     >
