@@ -267,6 +267,75 @@ export function IconTiktok(props: IconProps) {
   );
 }
 
+export function IconGrid(props: IconProps) {
+  return (
+    <Base {...props}>
+      {[
+        [4, 4],
+        [13, 4],
+        [4, 13],
+        [13, 13],
+      ].map(([x, y]) => (
+        <rect key={`${x}-${y}`} x={x} y={y} width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.6" />
+      ))}
+    </Base>
+  );
+}
+
+export function IconBuilding(props: IconProps) {
+  return (
+    <Base {...props}>
+      <path
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+        d="M5 21V5a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v16M14 21V9h4a1 1 0 0 1 1 1v11M3 21h18"
+      />
+      <path stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" d="M8 8h2M8 12h2M8 16h2" />
+    </Base>
+  );
+}
+
+export function IconImageStack(props: IconProps) {
+  return (
+    <Base {...props}>
+      <rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" strokeWidth="1.6" />
+      <circle cx="8.5" cy="10" r="1.5" stroke="currentColor" strokeWidth="1.6" />
+      <path stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" d="m4 17 5-5 3 3 3-3 5 5" />
+    </Base>
+  );
+}
+
+export function IconInbox(props: IconProps) {
+  return (
+    <Base {...props}>
+      <path
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+        d="M4 13 6 5h12l2 8v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-5Z"
+      />
+      <path stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" d="M4 13h4l1 2h6l1-2h4" />
+    </Base>
+  );
+}
+
+export function IconSliders(props: IconProps) {
+  return (
+    <Base {...props}>
+      <path
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        d="M4 7h8M16 7h4M4 12h4M12 12h8M4 17h11M19 17h1"
+      />
+      <circle cx="14" cy="7" r="2" stroke="currentColor" strokeWidth="1.6" />
+      <circle cx="10" cy="12" r="2" stroke="currentColor" strokeWidth="1.6" />
+      <circle cx="17" cy="17" r="2" stroke="currentColor" strokeWidth="1.6" />
+    </Base>
+  );
+}
+
 export function IconWhatsapp(props: IconProps) {
   return (
     <Base {...props}>

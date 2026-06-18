@@ -104,7 +104,15 @@ export function SiteFooter({
           <p>
             © {year} {siteConfig.legalName}. {t.rights}
           </p>
-          <p className="uppercase tracking-[0.2em]">{t.region}</p>
+          <div className="flex items-center gap-5">
+            <span className="uppercase tracking-[0.2em]">{t.region}</span>
+            <Link
+              href={`/${locale}/dashboard`}
+              className="uppercase tracking-[0.2em] transition-colors hover:text-cream"
+            >
+              Console
+            </Link>
+          </div>
         </Container>
       </div>
     </footer>

@@ -2,10 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 import "../globals.css";
-import { SiteHeader } from "@/components/layout/SiteHeader";
-import { SiteFooter } from "@/components/layout/SiteFooter";
-import { MusicProvider } from "@/components/audio/MusicProvider";
-import { buildJsonLd } from "@/lib/jsonld";
 import { siteConfig } from "@/lib/site";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { isLocale, locales, localeMeta } from "@/i18n/config";
@@ -100,41 +96,13 @@ export default async function LocaleLayout({
 }) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
-  const dict = getDictionary(locale);
-  const jsonLd = buildJsonLd(locale, dict);
 
   return (
     <html
       lang={localeMeta[locale].htmlLang}
       className={`${display.variable} ${sans.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col bg-cream">
-        <a
-          href="#main"
-          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-ink focus:px-5 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-cream"
-        >
-          {dict.a11y.skipToContent}
-        </a>
-
-        <MusicProvider src="/audio/woman-glow.mp3" title="Woman's Glow">
-          <SiteHeader
-            locale={locale}
-            nav={dict.nav}
-            cta={dict.header.cta}
-            a11y={dict.a11y}
-            email={siteConfig.contact.email}
-          />
-          <main id="main" className="flex-1">
-            {children}
-          </main>
-          <SiteFooter locale={locale} t={dict.footer} nav={dict.nav} areas={dict.areas.list} />
-        </MusicProvider>
-
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-      </body>
+      <body className="flex min-h-full flex-col bg-cream">{children}</body>
     </html>
   );
 }
