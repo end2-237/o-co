@@ -105,7 +105,7 @@ export default async function PropertyPage({ params }: { params: Params }) {
 
         <div className="mt-6">
           <PropertyGallery
-            image={property.image}
+            images={property.gallery}
             alt={property.alt}
             name={property.name}
             location={property.location}

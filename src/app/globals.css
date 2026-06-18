@@ -156,6 +156,19 @@
   animation: oco-loader 1.1s ease-in-out infinite;
 }
 
+/* Lightbox image crossfade. */
+@keyframes oco-fade {
+  from {
+    opacity: 0.25;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.animate-fade {
+  animation: oco-fade 280ms ease-out;
+}
+
 /* Scroll-triggered reveals (initial hidden state is applied by JS, so content
    stays visible without JS and for reduced motion). */
 [data-reveal] {

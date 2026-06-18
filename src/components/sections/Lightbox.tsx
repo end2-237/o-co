@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { IconClose } from "@/components/ui/icons";
+import { cn } from "@/lib/utils";
 
 export type LightboxItem = {
   src: string;
@@ -20,22 +21,24 @@ const SIZE_TRANSITION = (["top", "left", "width", "height", "border-radius"] as 
   .join(", ");
 
 /**
- * Fullscreen image lightbox with a "drape" reveal.
- *
- * The image grows from the clicked card's rect (FLIP-style, animating
- * top/left/width/height so `object-cover` keeps the aspect honest) while an
- * SVG turbulence + displacement filter distorts it like rippling cloth, the
- * displacement easing to zero so it settles flat once fully spread.
+ * Fullscreen image lightbox with a cloth/drape reveal on open, and prev/next
+ * navigation through a gallery (buttons, arrow keys, swipe).
  */
 export function Lightbox({
-  item,
+  items,
+  index,
   rect,
   onClose,
 }: {
-  item: LightboxItem;
+  items: LightboxItem[];
+  index: number;
   rect: DOMRect;
   onClose: () => void;
 }) {
+  const [current, setCurrent] = useState(index);
+  const n = items.length;
+  const item = items[current];
+
   const containerRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const backdropRef = useRef<HTMLDivElement>(null);
@@ -45,6 +48,9 @@ export function Lightbox({
   const reduceRef = useRef(false);
   const closingRef = useRef(false);
   const rafRef = useRef(0);
+  const touchX = useRef(0);
+
+  const go = useCallback((dir: number) => setCurrent((c) => (c + dir + n) % n), [n]);
 
   const close = useCallback(() => {
     if (closingRef.current) return;
@@ -70,7 +76,6 @@ export function Lightbox({
     const img = imageRef.current;
     if (!c) return;
 
-    // Lock background scroll while open.
     const root = document.documentElement;
     const prevOverflow = root.style.overflow;
     root.style.overflow = "hidden";
@@ -87,11 +92,9 @@ export function Lightbox({
     };
 
     if (reduceRef.current) {
-      // No motion — snap to fullscreen.
       expand();
       if (backdropRef.current) backdropRef.current.style.opacity = "1";
     } else {
-      // Next frame: enable transition + apply the drape filter, then expand.
       rafRef.current = requestAnimationFrame(() => {
         c.style.transition = SIZE_TRANSITION;
         if (backdropRef.current) backdropRef.current.style.opacity = "1";
@@ -111,7 +114,7 @@ export function Lightbox({
           if (t < 1) {
             rafRef.current = requestAnimationFrame(tick);
           } else if (img) {
-            img.style.filter = "none"; // crisp + cheap once settled
+            img.style.filter = "none";
           }
         };
         rafRef.current = requestAnimationFrame(tick);
@@ -120,6 +123,8 @@ export function Lightbox({
 
     const onKey = (ev: KeyboardEvent) => {
       if (ev.key === "Escape") close();
+      else if (ev.key === "ArrowLeft") go(-1);
+      else if (ev.key === "ArrowRight") go(1);
     };
     window.addEventListener("keydown", onKey);
 
@@ -128,7 +133,7 @@ export function Lightbox({
       window.removeEventListener("keydown", onKey);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, [close]);
+  }, [close, go]);
 
   return (
     <div
@@ -137,7 +142,6 @@ export function Lightbox({
       aria-label={`${item.name}, ${item.location}`}
       className="fixed inset-0 z-[100]"
     >
-      {/* Backdrop */}
       <div
         ref={backdropRef}
         onClick={close}
@@ -145,7 +149,6 @@ export function Lightbox({
         style={{ opacity: 0 }}
       />
 
-      {/* Hidden filter definition */}
       <svg aria-hidden className="pointer-events-none absolute h-0 w-0">
         <filter id="oco-drape" x="-15%" y="-15%" width="130%" height="130%">
           <feTurbulence
@@ -167,7 +170,6 @@ export function Lightbox({
         </filter>
       </svg>
 
-      {/* Animated image container (starts at the card's rect) */}
       <div
         ref={containerRef}
         className="absolute overflow-hidden"
@@ -178,37 +180,68 @@ export function Lightbox({
           height: rect.height,
           borderRadius: 16,
         }}
+        onTouchStart={(e) => (touchX.current = e.touches[0].clientX)}
+        onTouchEnd={(e) => {
+          const dx = e.changedTouches[0].clientX - touchX.current;
+          if (Math.abs(dx) > 50) go(dx < 0 ? 1 : -1);
+        }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
+          key={current}
           ref={imageRef}
           src={item.src}
           alt={item.alt}
-          className="h-full w-full object-cover"
+          className={cn("h-full w-full object-cover", n > 1 && "animate-fade")}
           draggable={false}
         />
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-ink/20"
         />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 p-8 text-cream sm:p-12">
-          <span className="inline-block rounded-full border border-cream/40 px-3 py-1 text-[0.65rem] font-medium uppercase tracking-[0.16em]">
-            {item.type}
-          </span>
-          <h3 className="mt-3 font-display text-3xl font-medium sm:text-4xl">
-            {item.name}
-          </h3>
-          <p className="mt-1 text-cream/75">{item.location}</p>
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-8 text-cream sm:p-12">
+          <div>
+            <span className="inline-block rounded-full border border-cream/40 px-3 py-1 text-[0.65rem] font-medium uppercase tracking-[0.16em]">
+              {item.type}
+            </span>
+            <h3 className="mt-3 font-display text-3xl font-medium sm:text-4xl">{item.name}</h3>
+            <p className="mt-1 text-cream/75">{item.location}</p>
+          </div>
+          {n > 1 && (
+            <span className="shrink-0 text-sm font-medium text-cream/70">
+              {current + 1} / {n}
+            </span>
+          )}
         </div>
       </div>
 
-      {/* Close */}
+      {n > 1 && (
+        <>
+          <button
+            type="button"
+            onClick={() => go(-1)}
+            aria-label="Previous"
+            className="absolute left-4 top-1/2 z-[101] inline-flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-cream/30 bg-ink/40 text-2xl text-cream backdrop-blur-sm transition-colors hover:bg-ink/70 sm:left-6"
+          >
+            ‹
+          </button>
+          <button
+            type="button"
+            onClick={() => go(1)}
+            aria-label="Next"
+            className="absolute right-4 top-1/2 z-[101] inline-flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-cream/30 bg-ink/40 text-2xl text-cream backdrop-blur-sm transition-colors hover:bg-ink/70 sm:right-6"
+          >
+            ›
+          </button>
+        </>
+      )}
+
       <button
         ref={closeBtnRef}
         type="button"
         onClick={close}
         aria-label="Close"
-        className="absolute right-5 top-5 z-[101] inline-flex h-12 w-12 items-center justify-center rounded-full border border-cream/30 bg-ink/40 text-2xl text-cream backdrop-blur-sm transition-colors hover:bg-ink/70"
+        className="absolute right-4 top-5 z-[101] inline-flex h-12 w-12 items-center justify-center rounded-full border border-cream/30 bg-ink/40 text-2xl text-cream backdrop-blur-sm transition-colors hover:bg-ink/70 sm:right-6"
       >
         <IconClose />
       </button>

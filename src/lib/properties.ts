@@ -1,13 +1,18 @@
+import type { StaticImageData } from "next/image";
 import type { Dictionary } from "@/i18n/dictionaries/en";
-import { propertyImages } from "./property-images";
+import { propertyImages, propertyGalleries } from "./property-images";
 
 export type PropertyItem = Dictionary["properties"]["items"][number];
-export type Property = PropertyItem & { image: (typeof propertyImages)[string] };
+export type Property = PropertyItem & {
+  image: StaticImageData;
+  gallery: StaticImageData[];
+};
 
 export function getProperties(dict: Dictionary): Property[] {
   return dict.properties.items.map((item) => ({
     ...item,
     image: propertyImages[item.slug],
+    gallery: propertyGalleries[item.slug] ?? [propertyImages[item.slug]],
   }));
 }
 

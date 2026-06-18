@@ -5,35 +5,44 @@ import Image, { type StaticImageData } from "next/image";
 import { Lightbox, type LightboxItem } from "@/components/sections/Lightbox";
 
 /**
- * Property hero image that opens the fullscreen drape lightbox on click.
+ * Property gallery: a large cover plus a thumbnail strip. Clicking any image
+ * opens the fullscreen drape lightbox at that index, with prev/next.
  */
 export function PropertyGallery({
-  image,
+  images,
   alt,
   name,
   location,
   type,
   hint,
 }: {
-  image: StaticImageData;
+  images: StaticImageData[];
   alt: string;
   name: string;
   location: string;
   type: string;
   hint: string;
 }) {
-  const [active, setActive] = useState<{ rect: DOMRect } | null>(null);
-  const item: LightboxItem = { src: image.src, alt, name, location, type };
+  const [active, setActive] = useState<{ index: number; rect: DOMRect } | null>(null);
+  const items: LightboxItem[] = images.map((img, i) => ({
+    src: img.src,
+    alt: i === 0 ? alt : `${name} — ${i + 1}`,
+    name,
+    location,
+    type,
+  }));
+  const open = (index: number, el: HTMLElement) =>
+    setActive({ index, rect: el.getBoundingClientRect() });
 
   return (
     <>
       <button
         type="button"
-        onClick={(e) => setActive({ rect: e.currentTarget.getBoundingClientRect() })}
+        onClick={(e) => open(0, e.currentTarget)}
         className="group relative block aspect-[16/10] w-full overflow-hidden rounded-2xl bg-ink"
       >
         <Image
-          src={image}
+          src={images[0]}
           alt={alt}
           fill
           priority
@@ -45,8 +54,37 @@ export function PropertyGallery({
           {hint}
         </span>
       </button>
+
+      {images.length > 1 && (
+        <div className="mt-3 grid grid-cols-4 gap-3 sm:grid-cols-5">
+          {images.slice(1).map((img, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={(e) => open(i + 1, e.currentTarget)}
+              aria-label={`${name} — ${i + 2}`}
+              className="group relative block aspect-[4/3] overflow-hidden rounded-xl bg-ink"
+            >
+              <Image
+                src={img}
+                alt=""
+                fill
+                placeholder="blur"
+                sizes="(min-width: 640px) 18vw, 25vw"
+                className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+              />
+            </button>
+          ))}
+        </div>
+      )}
+
       {active && (
-        <Lightbox item={item} rect={active.rect} onClose={() => setActive(null)} />
+        <Lightbox
+          items={items}
+          index={active.index}
+          rect={active.rect}
+          onClose={() => setActive(null)}
+        />
       )}
     </>
   );
